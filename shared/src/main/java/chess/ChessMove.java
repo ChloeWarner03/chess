@@ -47,4 +47,9 @@ public class ChessMove {
         return promotionPiece; //I ended here!
         //throw new RuntimeException("Not implemented");
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s%s", startPosition, endPosition);
+    }
 }
