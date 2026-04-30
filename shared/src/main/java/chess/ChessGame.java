@@ -1,4 +1,4 @@
-package chess;
+package chess; //You are not going this one right now, later
 
 import java.util.Collection;
 

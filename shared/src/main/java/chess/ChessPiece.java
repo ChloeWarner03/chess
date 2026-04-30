@@ -1,8 +1,10 @@
 package chess;
 
+//These are my imports
 import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -38,14 +40,12 @@ public class ChessPiece {
      */
     public ChessGame.TeamColor getTeamColor() {
         return pieceColor;
-        //throw new RuntimeException("Not implemented");
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        //throw new RuntimeException("Not implemented");
         return type;
     }
 
@@ -57,43 +57,106 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        List<ChessMove> moves = new ArrayList<>();
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
-
-        if (type == PieceType.KNIGHT) {
-            checkAndAdd(board, myPosition, row + 2, col + 1, moves);
-            checkAndAdd(board, myPosition, row + 2, col - 1, moves);
-            checkAndAdd(board, myPosition, row - 2, col + 1, moves);
-            checkAndAdd(board, myPosition, row - 2, col - 1, moves);
-            checkAndAdd(board, myPosition, row + 1, col + 2, moves);
-            checkAndAdd(board, myPosition, row + 1, col - 2, moves);
-            checkAndAdd(board, myPosition, row - 1, col + 2, moves);
-            checkAndAdd(board, myPosition, row - 1, col - 2, moves);
-        }
         if (type == PieceType.KING) {
-            checkAndAdd(board, myPosition, row + 1, col, moves);     // up
-            checkAndAdd(board, myPosition, row - 1, col, moves);     // down
-            checkAndAdd(board, myPosition, row, col + 1, moves);     // right
-            checkAndAdd(board, myPosition, row, col - 1, moves);     // left
-            checkAndAdd(board, myPosition, row + 1, col + 1, moves); // up-right
-            checkAndAdd(board, myPosition, row + 1, col - 1, moves); // up-left
-            checkAndAdd(board, myPosition, row - 1, col + 1, moves); // down-right
-            checkAndAdd(board, myPosition, row - 1, col - 1, moves); // down-left
+            return moveKing(board, myPosition);
+        } else if (type == PieceType.QUEEN) {
+            return moveQueen (board, myPosition);
+        } else if (type == PieceType.BISHOP) {
+            return moveBishop (board, myPosition);
+        } else if (type == PieceType.KNIGHT) {
+            return moveKnight (board, myPosition);
+        } else if (type == PieceType.ROOK) {
+            return moveRook (board, myPosition);
+        } else {
+            return movePawn (board, myPosition);
         }
+    }
+
+    //These are going to be the different mothods for the different pieces
+
+    //KING!!!
+    private List<ChessMove> moveKing (ChessBoard board, ChessPosition pos) {
+        List<ChessMove> moves = new ArrayList<>();
+        int row = pos.getRow();
+        int col = pos.getColumn();
+        trymove(board, pos, row + 1, col, moves); //this is up
+        trymove(board, pos, row - 1, col, moves); // this is down
+        trymove(board, pos, row , col - 1, moves); //this is to the left
+        trymove(board, pos, row , col + 1, moves); //right
+        trymove(board, pos, row + 1 , col -1, moves); // up and to the left
+        trymove(board, pos, row + 1 , col +1, moves); // up and to the right
+        trymove(board, pos, row - 1 , col -1, moves); // down and to the left
+        trymove(board, pos, row - 1 , col + 1, moves); // up and to the right
 
         return moves;
     }
 
-    private void checkAndAdd(ChessBoard board, ChessPosition from, int newRow, int newCol, List<ChessMove> moves) {
-        if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) return; // off the board
+    private List<ChessMove> moveQueen (ChessBoard board, ChessPosition pos) {
+        List<ChessMove> moves = new ArrayList<>();
+        return moves;
+    }
 
-        ChessPosition destination = new ChessPosition(newRow, newCol);
-        ChessPiece occupant = board.getPiece(destination);
+    private List<ChessMove> moveBishop (ChessBoard board, ChessPosition pos) {
+        List<ChessMove> moves = new ArrayList<>();
+        return moves;
+    }
+//options, up 2, right 1 or left 1. right 2, up 1 or down 1, down 2, right 1 or left 1, left 2, up 1 and down 1
+    private List<ChessMove> moveKnight (ChessBoard board, ChessPosition pos) {
+        List<ChessMove> moves = new ArrayList<>();
+        int row = pos.getRow();
+        int col = pos.getColumn();
+        trymove(board, pos, row + 2, col + 1, moves); //up 2, right 1
+        trymove(board, pos, row + 2, col - 1 , moves); //up 2, left 1
+        trymove(board, pos, row - 2, col + 1, moves); //down 2, right 1
+        trymove(board, pos, row - 2, col - 1, moves); //down 2, left 1
+        trymove(board, pos, row + 1 , col + 2, moves); //right 2 up 1
+        trymove(board, pos, row - 1 , col + 2, moves); //right 2 down 1
+        trymove(board, pos, row + 1 , col - 2, moves); //left 2 up 1
+        trymove(board, pos, row - 1 , col - 2, moves); //left 2 down 1
+        return moves;
+    }
 
-        if (occupant == null || occupant.getTeamColor() != pieceColor) {
-            moves.add(new ChessMove(from, destination, null)); // empty or enemy, can move there
+    private List<ChessMove> moveRook (ChessBoard board, ChessPosition pos) {
+        List<ChessMove> moves = new ArrayList<>();
+        return moves;
+    }
+
+    private List<ChessMove> movePawn (ChessBoard board, ChessPosition pos) {
+        List<ChessMove> moves = new ArrayList<>();
+        return moves;
+    }
+
+
+    //These are going to be the helper functions that I create as I go
+
+
+    //try the move and see if it works
+    private void trymove(ChessBoard board, ChessPosition from, int newRow, int newCol, List<ChessMove> moves){
+            if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) return; //you are not on the board anymore
+
+            ChessPosition area = new ChessPosition(newRow, newCol);
+            ChessPiece piecethere = board.getPiece(area);
+
+            if (piecethere == null || piecethere.getTeamColor() != pieceColor) {
+                moves.add(new ChessMove(from, area, null)); // empty or enemy, can move there
+            }
+
         }
 
+    //This one I made for the pieces that slide, will use for queen, rook and bishop
+
+    private boolean slide(ChessBoard board, ChessPosition from, int newRow, int newCol, List<ChessMove> moves) {
+        ChessPosition area = new ChessPosition(newRow, newCol);
+        ChessPiece piecethere = board.getPiece(area);
+        if (piecethere == null) {
+            moves.add(new ChessMove(from, area, null));
+            return false; //keep going
+        } else if (piecethere.getTeamColor() != pieceColor) { //first we want o see what team they are on
+            moves.add(new ChessMove(from, area, null));
+            return true; //take the piece and stop
+        } else {
+            return true; //our side and stop
+        }
     }
+
 }

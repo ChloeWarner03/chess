@@ -23,7 +23,6 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        //throw new RuntimeException("Not implemented");
         squares[position.getRow()-1][position.getColumn()-1] = piece; //wrote
     }
 
@@ -36,7 +35,6 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
 
-        //throw new RuntimeException("Not implemented");
         return squares[position.getRow()-1][position.getColumn()-1];
         //wrote but copied from above with return
         //Without the = piece part
@@ -47,10 +45,15 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() { //NEED TO DO
-        throw new RuntimeException("Not implemented");
+        squares = new ChessPiece[8][8];
     }
+        // first row of the boardL: this will be the order
+        // Order of the back row of the board
 
-    @Override //Added the hasstuff
+
+    //Override Objects
+
+    @Override //Added the hashstuff
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
