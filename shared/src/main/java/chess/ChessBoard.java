@@ -45,11 +45,32 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() { //NEED TO DO
-        squares = new ChessPiece[8][8];
-    }
-        // first row of the boardL: this will be the order
-        // Order of the back row of the board
+        squares = new ChessPiece[8][8]; //new board time!
 
+        //the order of the first row is going to be rook, knight, bishop, queen, king, bishop, knight, rook
+        ChessPiece.PieceType[] firstRow = {
+                ChessPiece.PieceType.ROOK,
+                ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.BISHOP,
+                ChessPiece.PieceType.QUEEN,
+                ChessPiece.PieceType.KING,
+                ChessPiece.PieceType.BISHOP,
+                ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.ROOK,
+        };
+
+        //PUT IN THE ROWS
+        for (int col = 1; col <= 8; col++) {
+
+            //this is the special row
+            addPiece(new ChessPosition(8, col), new ChessPiece(ChessGame.TeamColor.BLACK, firstRow[col - 1]));
+            addPiece(new ChessPosition(1, col), new ChessPiece(ChessGame.TeamColor.WHITE, firstRow[col - 1]));
+            //this is for the pawns
+            addPiece(new ChessPosition(7, col), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(2, col), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+        }
+
+    }
 
     //Override Objects
 
@@ -59,7 +80,7 @@ public class ChessBoard {
             return false;
         }
         ChessBoard that = (ChessBoard) o;
-        return Objects.deepEquals(squares, that.squares);
+        return Arrays.deepEquals(squares, that.squares); //Changed from Objects to Arrays
     }
 
     @Override
