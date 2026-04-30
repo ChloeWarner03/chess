@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Represents a single chess piece
@@ -56,12 +57,43 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ChessPiece piece = board.getPiece(myPosition);
-        if (piece.getPieceType() == PieceType.BISHOP) {
-            return List.of(new ChessMove(new ChessPosition(5,4), new ChessPosition(1,8), null));
+        List<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+        if (type == PieceType.KNIGHT) {
+            checkAndAdd(board, myPosition, row + 2, col + 1, moves);
+            checkAndAdd(board, myPosition, row + 2, col - 1, moves);
+            checkAndAdd(board, myPosition, row - 2, col + 1, moves);
+            checkAndAdd(board, myPosition, row - 2, col - 1, moves);
+            checkAndAdd(board, myPosition, row + 1, col + 2, moves);
+            checkAndAdd(board, myPosition, row + 1, col - 2, moves);
+            checkAndAdd(board, myPosition, row - 1, col + 2, moves);
+            checkAndAdd(board, myPosition, row - 1, col - 2, moves);
+        }
+        if (type == PieceType.KING) {
+            checkAndAdd(board, myPosition, row + 1, col, moves);     // up
+            checkAndAdd(board, myPosition, row - 1, col, moves);     // down
+            checkAndAdd(board, myPosition, row, col + 1, moves);     // right
+            checkAndAdd(board, myPosition, row, col - 1, moves);     // left
+            checkAndAdd(board, myPosition, row + 1, col + 1, moves); // up-right
+            checkAndAdd(board, myPosition, row + 1, col - 1, moves); // up-left
+            checkAndAdd(board, myPosition, row - 1, col + 1, moves); // down-right
+            checkAndAdd(board, myPosition, row - 1, col - 1, moves); // down-left
         }
 
-        return List.of(); //wrote as placeholder
-        //throw new RuntimeException("Not implemented");
+        return moves;
+    }
+
+    private void checkAndAdd(ChessBoard board, ChessPosition from, int newRow, int newCol, List<ChessMove> moves) {
+        if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) return; // off the board
+
+        ChessPosition destination = new ChessPosition(newRow, newCol);
+        ChessPiece occupant = board.getPiece(destination);
+
+        if (occupant == null || occupant.getTeamColor() != pieceColor) {
+            moves.add(new ChessMove(from, destination, null)); // empty or enemy, can move there
+        }
+
     }
 }
