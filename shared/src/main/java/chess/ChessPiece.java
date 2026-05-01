@@ -117,7 +117,21 @@ public class ChessPiece {
     }
 
     private List<ChessMove> moveRook (ChessBoard board, ChessPosition pos) {
-        List<ChessMove> moves = new ArrayList<>();
+        List<ChessMove> moves = new ArrayList<>(); //need to look at again
+        int row = pos.getRow();
+        int col = pos.getColumn();
+        for (int j = col - 1; j >= 1; j--) {        // left
+            if (slide(board, pos, row, j, moves)) break;
+        }
+        for (int i = row + 1; i <= 8; i++) {        // up
+            if (slide(board, pos, i, col, moves)) break;
+        }
+        for (int j = col + 1; j <= 8; j++) {        // right
+            if (slide(board, pos, row, j, moves)) break;
+        }
+        for (int i = row - 1; i >= 1; i--) {        // down
+            if (slide(board, pos, i, col, moves)) break;
+        }
         return moves;
     }
 
