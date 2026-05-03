@@ -72,6 +72,47 @@ public class ChessPiece {
         }
     }
 
+    private List<ChessMove> movePawn(ChessBoard board, ChessPosition pos) {
+        List<ChessMove> moves = new ArrayList<>();
+        int row = pos.getRow();
+        int col = pos.getColumn();
+
+        int direction;
+        int startRow;
+        int endRow;
+
+        if (pieceColor == ChessGame.TeamColor.WHITE) {
+            direction = 1;
+            startRow = 2;
+            endRow = 8;
+        } else {
+            direction = -1;
+            startRow = 7;
+            endRow = 1;
+        }
+
+        // one square forward
+        int oneForward = row + direction;
+        ChessPosition oneStep = new ChessPosition(oneForward, col);
+        if (board.getPiece(oneStep) == null) {
+            promotePawn(pos, oneStep, oneForward, endRow, moves);
+
+            // two squares forward only if on starting row
+            if (row == startRow) {
+                int doubleStepRow = row + 2 * direction;
+                ChessPosition doubleStep = new ChessPosition(doubleStepRow, col);
+                if (board.getPiece(doubleStep) == null) {
+                    moves.add(new ChessMove(pos, doubleStep, null));
+                }
+            }
+        }
+
+        // diagonal captures
+        capture(board, pos, oneForward, col - 1, endRow, moves); // left
+        capture(board, pos, oneForward, col + 1, endRow, moves); // right
+
+        return moves;
+    }
     //These are going to be the different mothods for the different pieces
 
     //KING!!!
@@ -91,13 +132,30 @@ public class ChessPiece {
         return moves;
     }
 
-    private List<ChessMove> moveQueen (ChessBoard board, ChessPosition pos) {
+    private List<ChessMove> moveQueen(ChessBoard board, ChessPosition pos) {
         List<ChessMove> moves = new ArrayList<>();
+        moves.addAll(moveRook(board, pos));
+        moves.addAll(moveBishop(board, pos));
         return moves;
     }
 
-    private List<ChessMove> moveBishop (ChessBoard board, ChessPosition pos) {
+    private List<ChessMove> moveBishop(ChessBoard board, ChessPosition pos) {
         List<ChessMove> moves = new ArrayList<>();
+        int row = pos.getRow();
+        int col = pos.getColumn();
+
+        for (int i = 1; row + i <= 8 && col - i >= 1; i++) {   // up to the left
+            if (slide(board, pos, row + i, col - i, moves)) break;
+        }
+        for (int i = 1; row + i <= 8 && col + i <= 8; i++) {   // up to the right
+            if (slide(board, pos, row + i, col + i, moves)) break;
+        }
+        for (int i = 1; row - i >= 1 && col - i >= 1; i++) {   // down to the left
+            if (slide(board, pos, row - i, col - i, moves)) break;
+        }
+        for (int i = 1; row - i >= 1 && col + i <= 8; i++) {   // down to the right
+            if (slide(board, pos, row - i, col + i, moves)) break;
+        }
         return moves;
     }
 //options, up 2, right 1 or left 1. right 2, up 1 or down 1, down 2, right 1 or left 1, left 2, up 1 and down 1
@@ -120,23 +178,18 @@ public class ChessPiece {
         List<ChessMove> moves = new ArrayList<>(); //need to look at again
         int row = pos.getRow();
         int col = pos.getColumn();
-        for (int j = col - 1; j >= 1; j--) {        // left
+        for (int j = col - 1;j >= 1; j--) {        // left
             if (slide(board, pos, row, j, moves)) break;
         }
-        for (int i = row + 1; i <= 8; i++) {        // up
+        for (int i = row + 1;i <= 8; i++) {        // up
             if (slide(board, pos, i, col, moves)) break;
         }
-        for (int j = col + 1; j <= 8; j++) {        // right
+        for (int j = col + 1;j <= 8; j++) {        // right
             if (slide(board, pos, row, j, moves)) break;
         }
-        for (int i = row - 1; i >= 1; i--) {        // down
+        for (int i = row - 1;i >= 1; i--) {        // down
             if (slide(board, pos, i, col, moves)) break;
         }
-        return moves;
-    }
-
-    private List<ChessMove> movePawn (ChessBoard board, ChessPosition pos) {
-        List<ChessMove> moves = new ArrayList<>();
         return moves;
     }
 
@@ -173,6 +226,27 @@ public class ChessPiece {
         }
     }
 
+    //capture diagonally for the pawn
+    private void capture(ChessBoard board, ChessPosition from, int newRow, int newCol, int endRow, List<ChessMove> moves) {
+        if (newCol < 1 || newCol > 8) return; // off the board
+        ChessPosition dest = new ChessPosition(newRow, newCol);
+        ChessPiece piecethere = board.getPiece(dest);
+        if (piecethere != null && piecethere.getTeamColor() != pieceColor) {
+            promotePawn(from, dest, newRow, endRow, moves);
+        }
+    }
+
+    //this is when the pawn is at then end and it can be promoted
+    private void promotePawn(ChessPosition from, ChessPosition dest, int destRow, int endRow, List<ChessMove> moves) {
+        if (destRow == endRow) {
+            moves.add(new ChessMove(from, dest, PieceType.QUEEN));
+            moves.add(new ChessMove(from, dest, PieceType.ROOK));
+            moves.add(new ChessMove(from, dest, PieceType.BISHOP));
+            moves.add(new ChessMove(from, dest, PieceType.KNIGHT));
+        } else {
+            moves.add(new ChessMove(from, dest, null));
+        }
+    }
 
 
     //Override Stuff
