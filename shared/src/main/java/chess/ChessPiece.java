@@ -71,7 +71,7 @@ public class ChessPiece {
             return movePawn (board, myPosition);
         }
     }
-
+    // the pawn is a weird one, I should make it a little more simple
     private List<ChessMove> movePawn(ChessBoard board, ChessPosition pos) {
         List<ChessMove> moves = new ArrayList<>();
         int row = pos.getRow();
