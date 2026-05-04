@@ -57,7 +57,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        if (type == PieceType.KING) {
+        if (type == PieceType.KING) { //The error when commiting says that I can use a switch function for this, replace the chain with switch expressions (need to look into)
             return moveKing(board, myPosition);
         } else if (type == PieceType.QUEEN) {
             return moveQueen (board, myPosition);
@@ -92,15 +92,15 @@ public class ChessPiece {
         }
 
         // one square forward
-        int oneForward = row + direction;
-        ChessPosition oneStep = new ChessPosition(oneForward, col);
+        int oneforward = row + direction;
+        ChessPosition oneStep = new ChessPosition(oneforward, col);
         if (board.getPiece(oneStep) == null) {
-            promotePawn(pos, oneStep, oneForward, endRow, moves);
+            promotePawn(pos, oneStep, oneforward, endRow, moves);
 
             // two squares forward only if on starting row
             if (row == startRow) {
-                int doubleStepRow = row + 2 * direction;
-                ChessPosition doubleStep = new ChessPosition(doubleStepRow, col);
+                int doublerow = row + 2 * direction;
+                ChessPosition doubleStep = new ChessPosition(doublerow, col);
                 if (board.getPiece(doubleStep) == null) {
                     moves.add(new ChessMove(pos, doubleStep, null));
                 }
@@ -108,8 +108,8 @@ public class ChessPiece {
         }
 
         // diagonal captures
-        capture(board, pos, oneForward, col - 1, endRow, moves); // left
-        capture(board, pos, oneForward, col + 1, endRow, moves); // right
+        capture(board, pos, oneforward, col - 1, endRow, moves); // left
+        capture(board, pos, oneforward, col + 1, endRow, moves); // right
 
         return moves;
     }
@@ -134,14 +134,14 @@ public class ChessPiece {
 
     private List<ChessMove> moveQueen(ChessBoard board, ChessPosition pos) {
         List<ChessMove> moves = new ArrayList<>();
-        moves.addAll(moveRook(board, pos));
-        moves.addAll(moveBishop(board, pos));
+        moves.addAll(moveRook(board, pos)); //Rook moves for the Queen
+        moves.addAll(moveBishop(board, pos)); //Bishop moves for the Queen
         return moves;
     }
 
     private List<ChessMove> moveBishop(ChessBoard board, ChessPosition pos) {
         List<ChessMove> moves = new ArrayList<>();
-        int row = pos.getRow();
+        int row = pos.getRow(); //The error says that I should refactor this method to reduce the cognitive complexity (need to look into)
         int col = pos.getColumn();
 
         for (int i = 1; row + i <= 8 && col - i >= 1; i++) {   // up to the left
@@ -229,22 +229,22 @@ public class ChessPiece {
     //capture diagonally for the pawn
     private void capture(ChessBoard board, ChessPosition from, int newRow, int newCol, int endRow, List<ChessMove> moves) {
         if (newCol < 1 || newCol > 8) return; // off the board
-        ChessPosition dest = new ChessPosition(newRow, newCol);
-        ChessPiece piecethere = board.getPiece(dest);
+        ChessPosition placement = new ChessPosition(newRow, newCol);
+        ChessPiece piecethere = board.getPiece(placement);
         if (piecethere != null && piecethere.getTeamColor() != pieceColor) {
-            promotePawn(from, dest, newRow, endRow, moves);
+            promotePawn(from, placement, newRow, endRow, moves);
         }
     }
 
     //this is when the pawn is at then end and it can be promoted
-    private void promotePawn(ChessPosition from, ChessPosition dest, int destRow, int endRow, List<ChessMove> moves) {
-        if (destRow == endRow) {
-            moves.add(new ChessMove(from, dest, PieceType.QUEEN));
-            moves.add(new ChessMove(from, dest, PieceType.ROOK));
-            moves.add(new ChessMove(from, dest, PieceType.BISHOP));
-            moves.add(new ChessMove(from, dest, PieceType.KNIGHT));
+    private void promotePawn(ChessPosition from, ChessPosition placement, int placementrow, int endRow, List<ChessMove> moves) {
+        if (placementrow == endRow) {
+            moves.add(new ChessMove(from, placement, PieceType.QUEEN));
+            moves.add(new ChessMove(from, placement, PieceType.ROOK));
+            moves.add(new ChessMove(from, placement, PieceType.BISHOP));
+            moves.add(new ChessMove(from, placement, PieceType.KNIGHT));
         } else {
-            moves.add(new ChessMove(from, dest, null));
+            moves.add(new ChessMove(from, placement, null));
         }
     }
 
