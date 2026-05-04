@@ -142,7 +142,7 @@ public class ChessPiece {
     private List<ChessMove> moveBishop(ChessBoard board, ChessPosition pos) {
         List<ChessMove> moves = new ArrayList<>();
         int row = pos.getRow(); //The error says that I should refactor this method to reduce the cognitive complexity (need to look into)
-        int col = pos.getColumn();
+        int col = pos.getColumn(); //Will need to do
 
         for (int i = 1; row + i <= 8 && col - i >= 1; i++) {   // up to the left
             if (slide(board, pos, row + i, col - i, moves)) break;
