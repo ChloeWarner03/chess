@@ -19,7 +19,7 @@ public class ChessPiece {
 
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        this.pieceColor = pieceColor;
+        this.pieceColor = pieceColor; //this is from the video
         this.type = type;
     }
 
