@@ -149,6 +149,28 @@ public class ChessGame {
         return false; // king is safe
     }
 
+
+    //These are going to be the helper functions for the next two
+    private boolean outOfMoves(TeamColor teamColor) {
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition pos = new ChessPosition(row, col);
+                if (moreMoves(teamColor, pos)) {
+                    return false; // found a legal move
+                }
+            }
+        }
+        return true; // no legal moves found
+    }
+
+    private boolean moreMoves(TeamColor teamColor, ChessPosition pos) {
+        ChessPiece piece = board.getPiece(pos);
+        if (piece != null && piece.getTeamColor() == teamColor) {
+            Collection<ChessMove> rightMove = validMoves(pos);
+            return rightMove != null && rightMove.size() > 0;
+        }
+        return false;
+    }
     /**
      * Determines if the given team is in checkmate
      *
@@ -158,21 +180,9 @@ public class ChessGame {
 //This is for Checkmate not just in check
     public boolean isInCheckmate(TeamColor teamColor) {
         if (!isInCheck(teamColor)) {
-            return false; //check if in check
+            return false;
         }
-        for (int row = 1; row <= 8; row++) { //go through all the squares
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition pos = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(pos);
-                if (piece != null && piece.getTeamColor() == teamColor) { //if our team chech if anymoves
-                    Collection<ChessMove> rightMove = validMoves(pos);
-                    if (rightMove != null && rightMove.size() > 0) {
-                        return false; //found move = not checkmate
-                    }
-                }
-            }
-        }
-        return true; //then it is in checkamte
+        return outOfMoves(teamColor);
     }
 
     /**
@@ -183,22 +193,10 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if (isInCheck(teamColor)) { //in check = not a stalemate
+        if (isInCheck(teamColor)) {
             return false;
         }
-        for (int row = 1; row <= 8; row++) { //go through every square on the board
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition pos = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(pos);
-                if (piece != null && piece.getTeamColor() == teamColor) { //our piece = chekc moves
-                    Collection<ChessMove> rightMove = validMoves(pos);
-                    if (rightMove != null && rightMove.size() > 0) {
-                        return false; //valid move = not stalemate
-                    }
-                }
-            }
-        }
-        return true; // no legal moves and not in check so stalemate
+        return outOfMoves(teamColor);
     }
 
     /**
