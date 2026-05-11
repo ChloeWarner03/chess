@@ -44,6 +44,20 @@ public class ChessGame {
         BLACK
     }
 
+    //These are my personal helper functions
+    private void testKing(ChessMove move, TeamColor color, Collection<ChessMove> correctMove) {
+        ChessPiece doMove = board.getPiece(move.getStartPosition());
+        ChessPiece takePiece = board.getPiece(move.getEndPosition());
+        board.addPiece(move.getEndPosition(), doMove); // make the move temporarily
+        board.addPiece(move.getStartPosition(), null);
+        boolean kingInRisk = isInCheck(color);        // if the king is safe add the move
+        if (!kingInRisk) {
+            correctMove.add(move);
+        }
+        board.addPiece(move.getStartPosition(), doMove); // undo the move so the board goes back to normal
+        board.addPiece(move.getEndPosition(), takePiece);
+    }
+
     /**
      * Gets all valid moves for a piece at the given location
      *
@@ -56,19 +70,12 @@ public class ChessGame {
         if (piece == null) {
             return null;
         }
-        Collection<ChessMove> legalMoves = new ArrayList<>();
-        for (ChessMove move : piece.pieceMoves(board, startPosition)) {
-            ChessPiece makeMove = board.getPiece(move.getStartPosition());
-            ChessPiece takePiece = board.getPiece(move.getEndPosition());
-            board.addPiece(move.getEndPosition(), makeMove);
-            board.addPiece(move.getStartPosition(), null);
-            if (!isInCheck(piece.getTeamColor())) {
-                legalMoves.add(move);
-            }
-            board.addPiece(move.getStartPosition(), makeMove);
-            board.addPiece(move.getEndPosition(), takePiece);
+        Collection<ChessMove> correctMove = new ArrayList<>();
+        Collection<ChessMove> entireMoves = piece.pieceMoves(board, startPosition);
+        for (ChessMove move : entireMoves) {
+            testKing(move, piece.getTeamColor(), correctMove);
         }
-        return legalMoves;
+        return correctMove;
     }
 
     /**
@@ -78,7 +85,24 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPiece playingPiece = board.getPiece(move.getStartPosition());
+        if (playingPiece == null || playingPiece.getTeamColor() != teamTurn) { // if there is no piece there or it is not your turn
+            throw new InvalidMoveException("Not your piece or no piece there");
+        }
+        Collection<ChessMove> rightMove = validMoves(move.getStartPosition()); // get all the legal moves for that piece
+        if (rightMove == null || !rightMove.contains(move)) { // if the move is not in the legal moves list throw an exception
+            throw new InvalidMoveException("That move is not legal");
+        }
+        if (move.getPromotionPiece() != null) { // if the pawn is getting promoted swap it out
+            playingPiece = new ChessPiece(teamTurn, move.getPromotionPiece());
+        }
+        board.addPiece(move.getEndPosition(), playingPiece); // put the piece in the new spot and clear the old spot
+        board.addPiece(move.getStartPosition(), null);
+        if (teamTurn == TeamColor.WHITE) { // switch whose turn it is
+            teamTurn = TeamColor.BLACK;
+        } else {
+            teamTurn = TeamColor.WHITE;
+        }
     }
 
     /**
