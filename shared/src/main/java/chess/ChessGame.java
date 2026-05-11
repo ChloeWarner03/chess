@@ -84,6 +84,8 @@ public class ChessGame {
      * @param move chess move to perform
      * @throws InvalidMoveException if move is invalid
      */
+
+    // see if you can make move
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece playingPiece = board.getPiece(move.getStartPosition());
         if (playingPiece == null || playingPiece.getTeamColor() != teamTurn) { // if there is no piece there or it is not your turn
@@ -111,6 +113,8 @@ public class ChessGame {
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
+
+    //This is for check and not checkmate and this means you got to move soemthing so the kign is not in check
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition foundKing = null; //find the king
         for (int row = 1; row <= 8; row++) {
@@ -151,6 +155,7 @@ public class ChessGame {
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
      */
+//This is for Checkmate not just in check
     public boolean isInCheckmate(TeamColor teamColor) {
         if (!isInCheck(teamColor)) {
             return false; //check if in check
