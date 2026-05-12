@@ -3,6 +3,7 @@ package chess; //This is for Phase 1 of the chess project
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Collections;
 
 /**
  * A class that can manage a chess game, making moves on a board
@@ -65,17 +66,24 @@ public class ChessGame {
         return null;
     }
 
+    private boolean pieceAttacksTarget(ChessPiece piece, ChessPosition pos, ChessPosition target, TeamColor attackingTeam) {
+        if (piece == null || piece.getTeamColor() != attackingTeam) {
+            return false;
+        }
+        for (ChessMove move : piece.pieceMoves(board, pos)) {
+            if (move.getEndPosition().equals(target)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean enemyReachesPiece(ChessPosition target, TeamColor attackingTeam) {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition pos = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(pos);
-                if (piece != null && piece.getTeamColor() == attackingTeam) {
-                    for (ChessMove move : piece.pieceMoves(board, pos)) {
-                        if (move.getEndPosition().equals(target)) {
-                            return true;
-                        }
-                    }
+                if (pieceAttacksTarget(board.getPiece(pos), pos, target, attackingTeam)) {
+                    return true;
                 }
             }
         }
@@ -117,7 +125,7 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
         if (piece == null) {
-            return null;
+            return Collections.emptyList();
         }
         Collection<ChessMove> correctMove = new ArrayList<>();
         for (ChessMove move : piece.pieceMoves(board, startPosition)) {
@@ -172,7 +180,7 @@ public class ChessGame {
         ChessPiece piece = board.getPiece(pos);
         if (piece != null && piece.getTeamColor() == teamColor) {
             Collection<ChessMove> legalMoves = validMoves(pos);
-            return legalMoves != null && legalMoves.size() > 0;
+            return legalMoves != null && !legalMoves.isEmpty();
         }
         return false;
     }
