@@ -11,6 +11,7 @@ import model.UserData;
 import service.AlreadyTakenException;
 import service.UserService;
 import java.util.Map;
+import service.UnauthorizedException;
 
 public class Server {
     //These are my services and data access
@@ -24,7 +25,7 @@ public class Server {
 
         //This is where I put my endpoints
         javalin.post("/user", this::register);
-
+        javalin.post("/session", this::login);
         //This catches any errors I did not handle
         javalin.exception(Exception.class, (e, ctx) -> {
             ctx.status(500);
@@ -58,5 +59,23 @@ public class Server {
 
     public void stop() {
         javalin.stop();
+    }
+
+    //This handles logging in a user
+    private void login(Context ctx) {
+        try {
+            //Get the user info from the request
+            UserData user = gson.fromJson(ctx.body(), UserData.class);
+            //Try to log them in
+            var result = userService.login(user);
+            ctx.json(gson.toJson(result));
+        } catch (UnauthorizedException e) {
+            //Wrong username or password
+            ctx.status(401);
+            ctx.json(Map.of("message", "Error: unauthorized"));
+        } catch (DataAccessException e) {
+            ctx.status(500);
+            ctx.json(Map.of("message", "Error: " + e.getMessage()));
+        }
     }
 }

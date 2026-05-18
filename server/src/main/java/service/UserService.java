@@ -30,4 +30,17 @@ public class UserService {
         dataAccess.createAuth(auth);
         return auth;
     }
+
+    //This logs in an existing user and gives them a new auth token
+    public AuthData login(UserData user) throws DataAccessException, UnauthorizedException {
+        //Check if user exists and password matches
+        UserData existing = dataAccess.getUser(user.username());
+        if (existing == null || !existing.password().equals(user.password())) {
+            throw new UnauthorizedException("Invalid username or password");
+        }
+        //Make a new token and store it
+        AuthData auth = new AuthData(UUID.randomUUID().toString(), user.username());
+        dataAccess.createAuth(auth);
+        return auth;
+    }
 }

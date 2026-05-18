@@ -35,4 +35,22 @@ public class UserServiceTests {
         userService.register(user);
         assertThrows(AlreadyTakenException.class, () -> userService.register(user));
     }
+
+    //This tests that login works
+    @Test
+    public void loginSuccess() throws DataAccessException, AlreadyTakenException, UnauthorizedException {
+        UserData user = new UserData("chloe", "1234", "chloe@email.com");
+        userService.register(user);
+        AuthData result = userService.login(user);
+        assertNotNull(result.authToken());
+        assertEquals("chloe", result.username());
+    }
+
+    //This tests that wrong password fails
+    @Test
+    public void loginWrongPassword() throws DataAccessException, AlreadyTakenException {
+        UserData user = new UserData("chloe", "1234", "chloe@email.com");
+        userService.register(user);
+        assertThrows(UnauthorizedException.class, () -> userService.login(new UserData("chloe", "wrongpassword", "")));
+    }
 }
