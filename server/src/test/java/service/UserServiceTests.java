@@ -53,4 +53,18 @@ public class UserServiceTests {
         userService.register(user);
         assertThrows(UnauthorizedException.class, () -> userService.login(new UserData("chloe", "wrongpassword", "")));
     }
+
+    //This tests that logout works
+    @Test
+    public void logoutSuccess() throws DataAccessException, AlreadyTakenException, UnauthorizedException {
+        UserData user = new UserData("chloe", "1234", "chloe@email.com");
+        AuthData auth = userService.register(user);
+        assertDoesNotThrow(() -> userService.logout(auth.authToken()));
+    }
+
+    //This tests that you cant logout with a bad token
+    @Test
+    public void logoutBadToken() {
+        assertThrows(UnauthorizedException.class, () -> userService.logout("badtoken"));
+    }
 }

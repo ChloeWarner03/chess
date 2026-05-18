@@ -43,4 +43,14 @@ public class UserService {
         dataAccess.createAuth(auth);
         return auth;
     }
+
+    //This logs out a user by deleting their auth token
+    public void logout(String authToken) throws DataAccessException, UnauthorizedException {
+        //Check if the auth token is valid
+        if (dataAccess.getAuth(authToken) == null) {
+            throw new UnauthorizedException("Not logged in");
+        }
+        //Delete the auth token
+        dataAccess.deleteAuth(authToken);
+    }
 }
