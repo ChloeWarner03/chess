@@ -20,6 +20,10 @@ public class UserService {
     //This registers a new user and gives them an auth token
     public AuthData register(UserData user) throws DataAccessException {
         //Can't register if username is already taken
+        //Make sure all fields are provided
+        if (user.username() == null || user.password() == null || user.email() == null) {
+            throw new BadRequestException("Missing required fields");
+        }
         if (dataAccess.getUser(user.username()) != null) {
             throw new AlreadyTakenException("Username already taken");
         }
@@ -33,7 +37,10 @@ public class UserService {
 
     //This logs in an existing user and gives them a new auth token
     public AuthData login(UserData user) throws DataAccessException {
-
+        //Make sure username and password are provided
+        if (user.username() == null || user.password() == null) {
+            throw new BadRequestException("Missing required fields");
+        }
         //Check if user exists and password matches
         UserData existing = dataAccess.getUser(user.username());
         if (existing == null || !existing.password().equals(user.password())) {

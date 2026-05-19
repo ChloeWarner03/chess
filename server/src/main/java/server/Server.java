@@ -152,16 +152,18 @@ public class Server {
             BadRequestException,
             AlreadyTakenException {
 
+        //Get the auth token from the header
         String authToken = ctx.header("authorization");
-
+        //Get the game info from the request body
         var body = gson.fromJson(ctx.body(), Map.class);
-
         String playerColor = (String) body.get("playerColor");
-
-        int gameID = ((Double) body.get("gameID")).intValue();
-
+        //Check if gameID is null before parsing
+        Object gameIDObj = body.get("gameID");
+        if (gameIDObj == null) {
+            throw new BadRequestException("Missing gameID");
+        }
+        int gameID = ((Double) gameIDObj).intValue();
         gameService.joinGame(authToken, playerColor, gameID);
-
-        ctx.result("{}");
+        ctx.json("{}");
     }
 }

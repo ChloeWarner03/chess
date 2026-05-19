@@ -50,6 +50,10 @@ public class GameService {
     public void joinGame(String authToken, String playerColor, int gameID)
             throws DataAccessException, UnauthorizedException, BadRequestException, AlreadyTakenException {
         //Check if the auth token is valid
+        //Make sure playerColor and gameID are valid
+        if (playerColor == null || (!playerColor.equals("WHITE") && !playerColor.equals("BLACK"))) {
+            throw new BadRequestException("Invalid player color");
+        }
         AuthData auth = dataAccess.getAuth(authToken);
         if (auth == null) {
             throw new UnauthorizedException("Not logged in");
