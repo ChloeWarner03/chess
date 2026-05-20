@@ -16,13 +16,17 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
+
     //register a new user and give auth token
     public AuthData register(UserData newUser) throws DataAccessException {
-        HaveAllInfo(newUser);
+        haveAllInfo(newUser);
         checkUsername(newUser.username());
         dataAccess.createUser(newUser);
         return storeToken(newUser.username());
     }
+
+
+
     //log existing user, give new token
     public AuthData login(UserData user) throws DataAccessException {
         loginHaveInfo(user);
@@ -36,9 +40,10 @@ public class UserService {
         dataAccess.deleteAuth(authToken);
     }
 
+
     //helperS!!!
     //HAVE ALL INFO
-    private void HaveAllInfo(UserData newUser) {
+    private void haveAllInfo(UserData newUser) {
         if (newUser.username() == null || newUser.password() == null || newUser.email() == null) {
             throw new BadRequestException("missing required fields");
         }
@@ -50,12 +55,13 @@ public class UserService {
             throw new UnauthorizedException("wrong password");
         }
     }
-    //need username and password to login
-    private void loginHaveInfo(UserData user) {
-        if (user.username() == null || user.password() == null) {
-            throw new BadRequestException("missing required fields");
+    //check is token valid
+    private void validToken(String authToken) throws DataAccessException {
+        if (dataAccess.getAuth(authToken) == null) {
+            throw new UnauthorizedException("unauthorized");
         }
     }
+
 
     //username taken
     private void checkUsername(String username) throws DataAccessException {
@@ -63,14 +69,14 @@ public class UserService {
             throw new AlreadyTakenException("username taken");
         }
     }
-
-
-    //check is token valid
-    private void validToken(String authToken) throws DataAccessException {
-        if (dataAccess.getAuth(authToken) == null) {
-            throw new UnauthorizedException("unauthorized");
+    //need username and password to login
+    private void loginHaveInfo(UserData user) {
+        if (user.username() == null || user.password() == null) {
+            throw new BadRequestException("missing required fields");
         }
     }
+
+
 
 
     //store token

@@ -16,6 +16,9 @@ import service.UserService;
 
 import java.util.Map;
 
+//There is a recommendation for this one to have a constant instead of duplicating
+// for gameID, game, authroization and message
+
 public class Server {
 
     //services and data access
@@ -104,14 +107,6 @@ public class Server {
         ctx.result("{}");
     }
 
-    //Clear
-    private void clear(Context ctx)
-            throws DataAccessException {
-
-        gameService.clear();
-        ctx.result("{}");
-    }
-
     //Create
     private void createGame(Context ctx)
             throws DataAccessException,
@@ -157,5 +152,13 @@ public class Server {
         int gameID = ((Double) body.get("gameID")).intValue();
         gameService.joinGame(authToken, playerColor, gameID);
         ctx.json("{}");
+    }
+
+    //Clear
+    private void clear(Context ctx)
+            throws DataAccessException {
+
+        gameService.clear();
+        ctx.result("{}");
     }
 }

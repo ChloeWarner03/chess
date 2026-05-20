@@ -7,6 +7,10 @@ import model.AuthData;
 import model.GameData;
 import java.util.List;
 
+//There is a recommendation for this one to have a constant instead of duplicating
+//WHite but sine Chess Game has a color enum do I want to keep it constant?
+
+
 //Game related stuff
 public class GameService {
 
@@ -64,13 +68,6 @@ public class GameService {
         }
     }
 
-    //black or white color
-    private void color(String playerColor) {
-        if (playerColor == null || (!playerColor.equals("WHITE") && !playerColor.equals("BLACK"))) {
-            throw new BadRequestException("Invalid player color");
-        }
-    }
-
     //game? or throw
     private GameData getGame(int gameID) throws DataAccessException, BadRequestException {
         GameData game = dataAccess.getGame(gameID);
@@ -79,15 +76,7 @@ public class GameService {
         }
         return game;
     }
-    //color already taken
-    private void colorisntTaken(String playerColor, GameData game) throws AlreadyTakenException {
-        if (playerColor.equals("WHITE") && game.whiteUsername() != null) {
-            throw new AlreadyTakenException("Color already taken");
-        }
-        if (playerColor.equals("BLACK") && game.blackUsername() != null) {
-            throw new AlreadyTakenException("Color already taken");
-        }
-    }
+
     //game with new player
     private void newPlayer(String username, String playerColor, GameData game)
             throws DataAccessException {
@@ -99,5 +88,22 @@ public class GameService {
         }
         dataAccess.updateGame(updatedGame);
     }
+    //color already taken
+    private void colorisntTaken(String playerColor, GameData game) throws AlreadyTakenException {
+        if (playerColor.equals("WHITE") && game.whiteUsername() != null) {
+            throw new AlreadyTakenException("Color already taken");
+        }
+        if (playerColor.equals("BLACK") && game.blackUsername() != null) {
+            throw new AlreadyTakenException("Color already taken");
+        }
+    }
+
+    //black or white color
+    private void color(String playerColor) {
+        if (playerColor == null || (!playerColor.equals("WHITE") && !playerColor.equals("BLACK"))) {
+            throw new BadRequestException("Invalid player color");
+        }
+    }
+
 
 }
