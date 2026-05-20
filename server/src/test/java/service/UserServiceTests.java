@@ -64,4 +64,25 @@ public class UserServiceTests {
     public void logoutBadToken() {
         assertThrows(UnauthorizedException.class, () -> userService.logout("badtoken"));
     }
+
+    //missing fields = BadRequestException
+    @Test
+    public void registerMissingFields() {
+        assertThrows(BadRequestException.class,
+                () -> userService.register(new UserData("chloe", null, "chloe@email.com")));
+    }
+
+    //user that is not real cannot login
+    @Test
+    public void loginNoSuchUser() {
+        assertThrows(UnauthorizedException.class,
+                () -> userService.login(new UserData("ghost", "1234", "")));
+    }
+
+    //missing password
+    @Test
+    public void loginMissingFields() {
+        assertThrows(BadRequestException.class,
+                () -> userService.login(new UserData("chloe", null, "")));
+    }
 }

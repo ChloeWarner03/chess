@@ -76,4 +76,34 @@ public class GameServiceTests {
     public void clearSuccess() throws DataAccessException {
         assertDoesNotThrow(() -> gameService.clear());
     }
+
+    // bad token cant join game
+    @Test
+    public void joinUnauthorized() throws DataAccessException,
+            UnauthorizedException, BadRequestException {
+        int gameID = gameService.createGame(authToken, "myGame");
+        assertThrows(UnauthorizedException.class,
+                () -> gameService.joinGame("badtoken", "WHITE", gameID));
+    }
+    // invalid color throws BadRequestException
+    @Test
+    public void joinInvalidColor() throws DataAccessException,
+            UnauthorizedException, BadRequestException {
+        int gameID = gameService.createGame(authToken, "myGame");
+        assertThrows(BadRequestException.class,
+                () -> gameService.joinGame(authToken, "PURPLE", gameID));
+    }
+    // Cannot join a game that does not exist
+    @Test
+    public void joinBadGameID() {
+        assertThrows(BadRequestException.class,
+                () -> gameService.joinGame(authToken, "WHITE", 99999));
+    }
+
+    //Base case when there are no games there is no list
+    @Test
+    public void listEmpty() throws DataAccessException, UnauthorizedException {
+        List<GameData> games = gameService.listGames(authToken);
+        assertTrue(games.isEmpty());
+    }
 }
