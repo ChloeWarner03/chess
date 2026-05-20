@@ -178,16 +178,24 @@ public class ChessPiece {
         int row = pos.getRow();
         int col = pos.getColumn();
         for (int j = col - 1;j >= 1; j--) {        // left
-            if (slide(board, pos, row, j, moves)) break;
+            if (slide(board, pos, row, j, moves)) {
+                break;
+            }
         }
         for (int i = row + 1;i <= 8; i++) {        // up
-            if (slide(board, pos, i, col, moves)) break;
+            if (slide(board, pos, i, col, moves)) {
+                break;
+            }
         }
         for (int j = col + 1;j <= 8; j++) {        // right
-            if (slide(board, pos, row, j, moves)) break;
+            if (slide(board, pos, row, j, moves)){
+                break;
+            }
         }
         for (int i = row - 1;i >= 1; i--) {        // down
-            if (slide(board, pos, i, col, moves)) break;
+            if (slide(board, pos, i, col, moves)) {
+                break;
+            }
         }
         return moves;
     }
@@ -259,8 +267,9 @@ public class ChessPiece {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass())
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         ChessPiece that = (ChessPiece) o;
             return pieceColor == that.pieceColor && type == that.type;
     }
