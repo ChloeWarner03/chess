@@ -57,7 +57,8 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        if (type == PieceType.KING) { //The error when commiting says that I can use a switch function for this, replace the chain with switch expressions (need to look into)
+        if (type == PieceType.KING) {
+            //The error when commiting says that I can use a switch function for this, replace the chain with switch expressions (need to look into)
             return moveKing(board, myPosition);
         } else if (type == PieceType.QUEEN) {
             return moveQueen (board, myPosition);
@@ -199,7 +200,9 @@ public class ChessPiece {
 
     //try the move and see if it works
     private void trymove(ChessBoard board, ChessPosition from, int newRow, int newCol, List<ChessMove> moves){
-            if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) return; //you are not on the board anymore
+            if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
+                return; //you are not on the board anymore
+            }
 
             ChessPosition area = new ChessPosition(newRow, newCol);
             ChessPiece piecethere = board.getPiece(area);
@@ -218,7 +221,8 @@ public class ChessPiece {
         if (piecethere == null) {
             moves.add(new ChessMove(from, area, null));
             return false; //keep going
-        } else if (piecethere.getTeamColor() != pieceColor) { //first we want o see what team they are on
+        } else if (piecethere.getTeamColor() != pieceColor) {
+            //first we want to see what team they are on
             moves.add(new ChessMove(from, area, null));
             return true; //take the piece and stop
         } else {
@@ -228,7 +232,9 @@ public class ChessPiece {
 
     //capture diagonally for the pawn
     private void capture(ChessBoard board, ChessPosition from, int newRow, int newCol, int endRow, List<ChessMove> moves) {
-        if (newCol < 1 || newCol > 8) return; // off the board
+        if (newCol < 1 || newCol > 8) {
+            return; // off the board
+        }
         ChessPosition placement = new ChessPosition(newRow, newCol);
         ChessPiece piecethere = board.getPiece(placement);
         if (piecethere != null && piecethere.getTeamColor() != pieceColor) {

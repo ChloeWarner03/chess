@@ -44,7 +44,8 @@ public class GameService {
 
     //join game
     public void joinGame(String authToken, String playerColor, int gameID)
-            throws DataAccessException, UnauthorizedException, BadRequestException, AlreadyTakenException {
+            throws DataAccessException, UnauthorizedException,
+            BadRequestException, AlreadyTakenException {
         validToken(authToken);
         color(playerColor);
         GameData game = getGame(gameID);
@@ -55,7 +56,8 @@ public class GameService {
 
     //Helpers!
     //check is token valid
-    private void validToken(String authToken) throws DataAccessException, UnauthorizedException {
+    private void validToken(String authToken) throws DataAccessException,
+            UnauthorizedException {
         if (dataAccess.getAuth(authToken) == null) {
             throw new UnauthorizedException("Not logged in");
         }
@@ -69,7 +71,8 @@ public class GameService {
     }
 
     //game? or throw
-    private GameData getGame(int gameID) throws DataAccessException, BadRequestException {
+    private GameData getGame(int gameID) throws DataAccessException,
+            BadRequestException {
         GameData game = dataAccess.getGame(gameID);
         if (game == null) {
             throw new BadRequestException("Game not found");
@@ -100,7 +103,8 @@ public class GameService {
 
     //black or white color
     private void color(String playerColor) {
-        if (playerColor == null || (!playerColor.equals("WHITE") && !playerColor.equals("BLACK"))) {
+        if (playerColor == null || (!playerColor.equals("WHITE")
+                && !playerColor.equals("BLACK"))) {
             throw new BadRequestException("Invalid player color");
         }
     }
