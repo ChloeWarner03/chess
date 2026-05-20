@@ -57,20 +57,14 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        if (type == PieceType.KING) {
-            //The error when commiting says that I can use a switch function for this, replace the chain with switch expressions (need to look into)
-            return moveKing(board, myPosition);
-        } else if (type == PieceType.QUEEN) {
-            return moveQueen (board, myPosition);
-        } else if (type == PieceType.BISHOP) {
-            return moveBishop (board, myPosition);
-        } else if (type == PieceType.KNIGHT) {
-            return moveKnight (board, myPosition);
-        } else if (type == PieceType.ROOK) {
-            return moveRook (board, myPosition);
-        } else {
-            return movePawn (board, myPosition);
-        }
+        return switch (type) {
+            case KING -> moveKing(board, myPosition);
+            case QUEEN -> moveQueen(board, myPosition);
+            case BISHOP -> moveBishop(board, myPosition);
+            case KNIGHT -> moveKnight(board, myPosition);
+            case ROOK -> moveRook(board, myPosition);
+            case PAWN -> movePawn(board, myPosition);
+        };
     }
     // the pawn is a weird one, I should make it a little more simple
     private List<ChessMove> movePawn(ChessBoard board, ChessPosition pos) {
@@ -135,29 +129,33 @@ public class ChessPiece {
 
     private List<ChessMove> moveQueen(ChessBoard board, ChessPosition pos) {
         List<ChessMove> moves = new ArrayList<>();
-        moves.addAll(moveRook(board, pos)); //Rook moves for the Queen
-        moves.addAll(moveBishop(board, pos)); //Bishop moves for the Queen
+        moves.addAll(moveRook(board, pos));
+        moves.addAll(moveBishop(board, pos));
         return moves;
     }
 
-    private List<ChessMove> moveBishop(ChessBoard board, ChessPosition pos) {
+    private List<ChessMove>  moveBishop(ChessBoard board, ChessPosition pos) {
         List<ChessMove> moves = new ArrayList<>();
-        int row = pos.getRow(); //The error says that I should refactor this method to reduce the cognitive complexity (need to look into)
-        int col = pos.getColumn(); //Will need to do
-
-        for (int i = 1; row + i <= 8 && col - i >= 1; i++) {   // up to the left
-            if (slide(board, pos, row + i, col - i, moves)) break;
-        }
-        for (int i = 1; row + i <= 8 && col + i <= 8; i++) {   // up to the right
-            if (slide(board, pos, row + i, col + i, moves)) break;
-        }
-        for (int i = 1; row - i >= 1 && col - i >= 1; i++) {   // down to the left
-            if (slide(board, pos, row - i, col - i, moves)) break;
-        }
-        for (int i = 1; row - i >= 1 && col + i <= 8; i++) {   // down to the right
-            if (slide(board, pos, row - i, col + i, moves)) break;
-        }
+        slideDiagonal(board, pos, 1, 1, moves);
+        slideDiagonal(board, pos, 1, -1, moves);
+        slideDiagonal(board, pos, -1, 1, moves);
+        slideDiagonal(board, pos, -1, -1, moves);
         return moves;
+    }
+
+    private void slideDiagonal(ChessBoard board, ChessPosition pos, int rowDir, int colDir, List<ChessMove> moves) {
+        int row = pos.getRow();
+        int col = pos.getColumn();
+        for (int i = 1; i <= 8; i++) {
+            int newRow = row + i * rowDir;
+            int newCol = col + i * colDir;
+            if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
+                return;
+            }
+            if (slide(board, pos, newRow, newCol, moves)) {
+                return;
+            }
+        }
     }
 //options, up 2, right 1 or left 1. right 2, up 1 or down 1, down 2, right 1 or left 1, left 2, up 1 and down 1
     private List<ChessMove> moveKnight (ChessBoard board, ChessPosition pos) {
@@ -219,16 +217,19 @@ public class ChessPiece {
         ChessPosition area = new ChessPosition(newRow, newCol);
         ChessPiece piecethere = board.getPiece(area);
         if (piecethere == null) {
-            moves.add(new ChessMove(from, area, null)); {
+            moves.add(new ChessMove(from, area, null));
+            {
                 return false; //keep going
             }
-        } else if (piecethere.getTeamColor() != pieceColor) {
-            //first we want to see what team they are on
-            moves.add(new ChessMove(from, area, null));
-            return true; //take the piece and stop
-        } else {
-            return true; //our side and stop
         }
+        return blockedPiece(piecethere, from, area, null);
+    }
+
+    private boolean blockedPiece(ChessPiece piecethere, ChessPosition from, ChessPosition area, List<ChessMove> moves){
+        if (piecethere.getTeamColor() != pieceColor) {
+            moves.add(new ChessMove(from, area, null));
+        }
+        return true;
     }
 
     //capture diagonally for the pawn
@@ -260,13 +261,10 @@ public class ChessPiece {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || getClass() != o.getClass())
             return false;
-        }
         ChessPiece that = (ChessPiece) o;
-        {
             return pieceColor == that.pieceColor && type == that.type;
-        }
     }
 
     @Override
