@@ -218,15 +218,13 @@ public class ChessPiece {
         ChessPiece piecethere = board.getPiece(area);
         if (piecethere == null) {
             moves.add(new ChessMove(from, area, null));
-            {
                 return false; //keep going
-            }
         }
-        return blockedPiece(piecethere, from, area, null);
+        return blockedPiece(piecethere, from, area, moves);
     }
-
+// there was a problem with this one
     private boolean blockedPiece(ChessPiece piecethere, ChessPosition from, ChessPosition area, List<ChessMove> moves){
-        if (piecethere.getTeamColor() != pieceColor) {
+        if (piecethere != null && piecethere.getTeamColor() != pieceColor) {
             moves.add(new ChessMove(from, area, null));
         }
         return true;
