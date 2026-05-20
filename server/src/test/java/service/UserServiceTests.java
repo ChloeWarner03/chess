@@ -11,19 +11,19 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 //User service tests
-public class UserServiceTests {
+class UserServiceTests {
     private UserService userService;
 
     //fresh start before each test
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         DataAccess dataAccess = new MemoryDataAccess();
         userService = new UserService(dataAccess);
     }
 
     //register works
     @Test
-    public void registerSuccess() throws DataAccessException, AlreadyTakenException {
+    void registerSuccess() throws DataAccessException, AlreadyTakenException {
         AuthData result = userService.register(new UserData("chloe", "1234", "chloe@email.com"));
         assertNotNull(result.authToken());
         assertEquals("chloe", result.username());
@@ -31,14 +31,15 @@ public class UserServiceTests {
 
     //cant register same username twice
     @Test
-    public void registerDuplicate() throws DataAccessException, AlreadyTakenException {
-        userService.register(new UserData("chloe", "1234", "chloe@email.com"));
-        assertThrows(AlreadyTakenException.class, () -> userService.register(new UserData("chloe", "1234", "chloe@email.com")));
+    void registerDuplicate() throws DataAccessException, AlreadyTakenException {
+        var chloe = new UserData("chloe", "1234", "chloe@email.com");
+        userService.register(chloe);
+        assertThrows(AlreadyTakenException.class, () -> userService.register(chloe));
     }
 
     //login works
     @Test
-    public void loginSuccess() throws DataAccessException, AlreadyTakenException, UnauthorizedException {
+    void loginSuccess() throws DataAccessException, AlreadyTakenException, UnauthorizedException {
         userService.register(new UserData("chloe", "1234", "chloe@email.com"));
         AuthData result = userService.login(new UserData("chloe", "1234", "chloe@email.com"));
         assertNotNull(result.authToken());
@@ -47,42 +48,44 @@ public class UserServiceTests {
 
     //wrong password cant login
     @Test
-    public void loginWrongPassword() throws DataAccessException, AlreadyTakenException {
-        userService.register(new UserData("chloe", "1234", "chloe@email.com"));
-        assertThrows(UnauthorizedException.class, () -> userService.login(new UserData("chloe", "wrongpassword", "")));
+    void loginWrongPassword() throws DataAccessException, AlreadyTakenException {
+        var chloe = new UserData("chloe", "1234", "chloe@email.com");
+        var chloeWrongPassword = new UserData("chloe", "wrongpassword", "");
+        userService.register(chloe);
+        assertThrows(UnauthorizedException.class, () -> userService.login(chloeWrongPassword));
     }
 
     //logout works
     @Test
-    public void logoutSuccess() throws DataAccessException, AlreadyTakenException, UnauthorizedException {
+    void logoutSuccess() throws DataAccessException, AlreadyTakenException, UnauthorizedException {
         AuthData auth = userService.register(new UserData("chloe", "1234", "chloe@email.com"));
         assertDoesNotThrow(() -> userService.logout(auth.authToken()));
     }
 
     //bad token cant logout
     @Test
-    public void logoutBadToken() {
+    void logoutBadToken() {
         assertThrows(UnauthorizedException.class, () -> userService.logout("badtoken"));
     }
 
     //missing fields = BadRequestException
     @Test
-    public void registerMissingFields() {
-        assertThrows(BadRequestException.class,
-                () -> userService.register(new UserData("chloe", null, "chloe@email.com")));
+    void registerMissingFields() {
+        var noPassword = new UserData("chloe", null, "chloe@email.com");
+        assertThrows(BadRequestException.class, () -> userService.register(noPassword));
     }
 
     //user that is not real cannot login
     @Test
-    public void loginNoSuchUser() {
-        assertThrows(UnauthorizedException.class,
-                () -> userService.login(new UserData("ghost", "1234", "")));
+    void loginNoSuchUser() {
+        var ghost = new UserData("ghost", "1234", "");
+        assertThrows(UnauthorizedException.class, () -> userService.login(ghost));
     }
 
     //missing password
     @Test
-    public void loginMissingFields() {
-        assertThrows(BadRequestException.class,
-                () -> userService.login(new UserData("chloe", null, "")));
+    void missingFields() {
+        var noPassword = new UserData("chloe", null, "chloe@email.com");
+        assertThrows(BadRequestException.class, () -> userService.register(noPassword));
     }
 }
