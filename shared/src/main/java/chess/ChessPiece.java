@@ -219,8 +219,9 @@ public class ChessPiece {
         ChessPosition area = new ChessPosition(newRow, newCol);
         ChessPiece piecethere = board.getPiece(area);
         if (piecethere == null) {
-            moves.add(new ChessMove(from, area, null));
-            return false; //keep going
+            moves.add(new ChessMove(from, area, null)); {
+                return false; //keep going
+            }
         } else if (piecethere.getTeamColor() != pieceColor) {
             //first we want to see what team they are on
             moves.add(new ChessMove(from, area, null));
@@ -263,7 +264,9 @@ public class ChessPiece {
             return false;
         }
         ChessPiece that = (ChessPiece) o;
-        return pieceColor == that.pieceColor && type == that.type;
+        {
+            return pieceColor == that.pieceColor && type == that.type;
+        }
     }
 
     @Override

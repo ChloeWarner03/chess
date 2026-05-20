@@ -35,6 +35,11 @@ class GameServiceTests {
         int gameID = gameService.createGame(authToken, "myGame");
         assertTrue(gameID > 0);
     }
+    //Cant make a game with no name
+    @Test
+    void createGameNoName() {
+        assertThrows(BadRequestException.class, () -> gameService.createGame(authToken, null));
+    }
 
     //bad token cant create game
     @Test
@@ -72,7 +77,7 @@ class GameServiceTests {
     }
 
     //clear works
-    @Test
+    @Test //This one still says to remove the public modifier
     void clearSuccess() {
         assertDoesNotThrow(() -> gameService.clear());
     }

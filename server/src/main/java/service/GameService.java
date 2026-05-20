@@ -54,7 +54,7 @@ public class GameService {
         GameData game = getGame(gameID);
         colorisntTaken(playerColor, game);
         AuthData auth = dataAccess.getAuth(authToken);
-        newPlayer(auth.username(), playerColor, game);
+        newGamePlayer(auth.username(), playerColor, game);
     }
 
     //Helpers!
@@ -69,7 +69,7 @@ public class GameService {
     //need a game name
     private void gameName(String gameName) {
         if (gameName == null) {
-            throw new BadRequestException("Game name is required");
+            throw new BadRequestException("You need a Game Name");
         }
     }
 
@@ -84,7 +84,7 @@ public class GameService {
     }
 
     //game with new player
-    private void newPlayer(String username, String playerColor, GameData game)
+    private void newGamePlayer(String username, String playerColor, GameData game)
             throws DataAccessException {
         GameData updatedGame;
         if (playerColor.equals(WHITE)) {
@@ -97,10 +97,10 @@ public class GameService {
     //color already taken
     private void colorisntTaken(String playerColor, GameData game) throws AlreadyTakenException {
         if (playerColor.equals(WHITE) && game.whiteUsername() != null) {
-            throw new AlreadyTakenException("Color taken already");
+            throw new AlreadyTakenException("Color is already taken");
         }
         if (playerColor.equals(BLACK) && game.blackUsername() != null) {
-            throw new AlreadyTakenException("Color taken already");
+            throw new AlreadyTakenException("Color is already taken");
         }
     }
 

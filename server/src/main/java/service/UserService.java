@@ -45,7 +45,7 @@ public class UserService {
     //HAVE ALL INFO
     private void haveAllInfo(UserData newUser) {
         if (newUser.username() == null || newUser.password() == null || newUser.email() == null) {
-            throw new BadRequestException("missing required fields");
+            throw new BadRequestException("missing fields that are required");
         }
     }
     //check user exists and password matches
@@ -66,13 +66,13 @@ public class UserService {
     //username taken
     private void checkUsername(String username) throws DataAccessException {
         if (dataAccess.getUser(username) != null) {
-            throw new AlreadyTakenException("username taken");
+            throw new AlreadyTakenException("username is already taken");
         }
     }
     //need username and password to login
     private void loginHaveInfo(UserData user) {
         if (user.username() == null || user.password() == null) {
-            throw new BadRequestException("missing required fields");
+            throw new BadRequestException("missing fields that are required");
         }
     }
 
