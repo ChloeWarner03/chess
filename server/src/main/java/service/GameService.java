@@ -14,6 +14,9 @@ import java.util.List;
 //Game related stuff
 public class GameService {
 
+    private static final String WHITE = "WHITE";
+    private static final String BLACK = "BLACK";
+
     private final DataAccess dataAccess;
 
     //get my data access
@@ -75,7 +78,7 @@ public class GameService {
             BadRequestException {
         GameData game = dataAccess.getGame(gameID);
         if (game == null) {
-            throw new BadRequestException("Game not found");
+            throw new BadRequestException("Couldn't Find Game");
         }
         return game;
     }
@@ -84,7 +87,7 @@ public class GameService {
     private void newPlayer(String username, String playerColor, GameData game)
             throws DataAccessException {
         GameData updatedGame;
-        if (playerColor.equals("WHITE")) {
+        if (playerColor.equals(WHITE)) {
             updatedGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
         } else {
             updatedGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
@@ -93,19 +96,19 @@ public class GameService {
     }
     //color already taken
     private void colorisntTaken(String playerColor, GameData game) throws AlreadyTakenException {
-        if (playerColor.equals("WHITE") && game.whiteUsername() != null) {
-            throw new AlreadyTakenException("Color already taken");
+        if (playerColor.equals(WHITE) && game.whiteUsername() != null) {
+            throw new AlreadyTakenException("Color taken already");
         }
-        if (playerColor.equals("BLACK") && game.blackUsername() != null) {
-            throw new AlreadyTakenException("Color already taken");
+        if (playerColor.equals(BLACK) && game.blackUsername() != null) {
+            throw new AlreadyTakenException("Color taken already");
         }
     }
 
     //black or white color
     private void color(String playerColor) {
-        if (playerColor == null || (!playerColor.equals("WHITE")
-                && !playerColor.equals("BLACK"))) {
-            throw new BadRequestException("Invalid player color");
+        if (playerColor == null || (!playerColor.equals(WHITE)
+                && !playerColor.equals(BLACK))) {
+            throw new BadRequestException("Can't Use This Color");
         }
     }
 
