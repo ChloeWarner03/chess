@@ -6,62 +6,78 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 import java.util.UUID;
-//fizing things
 
-//This handles everything user related
+//User related stuff
 public class UserService {
     private final DataAccess dataAccess;
 
-    //This is how I get my data access
+    //Get my data access
     public UserService(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
 
-    //This registers a new user and gives them an auth token
-    public AuthData register(UserData user) throws DataAccessException {
-        //Can't register if username is already taken
-        //Make sure all fields are provided
-        if (user.username() == null || user.password() == null || user.email() == null) {
-            throw new BadRequestException("Missing required fields");
-        }
-        if (dataAccess.getUser(user.username()) != null) {
-            throw new AlreadyTakenException("Username already taken");
-        }
-        //Create the user in memory
-        dataAccess.createUser(user);
-        //Make a unique token and store it
-        AuthData auth = new AuthData(UUID.randomUUID().toString(), user.username());
-        dataAccess.createAuth(auth);
-        return auth;
+    //register a new user and give auth token
+    public AuthData register(UserData newUser) throws DataAccessException {
+        HaveAllInfo(newUser);
+        checkUsername(newUser.username());
+        dataAccess.createUser(newUser);
+        return storeToken(newUser.username());
     }
-
-    //This logs in an existing user and gives them a new auth token
+    //log existing user, give new token
     public AuthData login(UserData user) throws DataAccessException {
-        //Make sure username and password are provided
-        if (user.username() == null || user.password() == null) {
-            throw new BadRequestException("Missing required fields");
-        }
-        //Check if user exists and password matches
-        UserData existing = dataAccess.getUser(user.username());
-        if (existing == null || !existing.password().equals(user.password())) {
-            throw new UnauthorizedException("Invalid username or password");
-        }
-        //Make a new token and store it
-        AuthData auth = new AuthData(
-                UUID.randomUUID().toString(),
-                user.username()
-        );
-        dataAccess.createAuth(auth);
-        return auth;
+        loginHaveInfo(user);
+        checkPassword(user);
+        return storeToken(user.username());
     }
 
-    //This logs out a user by deleting their auth token
+    //logout, delete token
     public void logout(String authToken) throws DataAccessException {
-        //Check if the auth token is valid
-        if (dataAccess.getAuth(authToken) == null) {
-            throw new UnauthorizedException("Error: unauthorized");
-        }
-        //Delete the auth token
+        validToken(authToken);
         dataAccess.deleteAuth(authToken);
     }
+
+    //helperS!!!
+    //HAVE ALL INFO
+    private void HaveAllInfo(UserData newUser) {
+        if (newUser.username() == null || newUser.password() == null || newUser.email() == null) {
+            throw new BadRequestException("missing required fields");
+        }
+    }
+    //check user exists and password matches
+    private void checkPassword(UserData user) throws DataAccessException {
+        UserData existingUser = dataAccess.getUser(user.username());
+        if (existingUser == null || !existingUser.password().equals(user.password())) {
+            throw new UnauthorizedException("wrong password");
+        }
+    }
+    //need username and password to login
+    private void loginHaveInfo(UserData user) {
+        if (user.username() == null || user.password() == null) {
+            throw new BadRequestException("missing required fields");
+        }
+    }
+
+    //username taken
+    private void checkUsername(String username) throws DataAccessException {
+        if (dataAccess.getUser(username) != null) {
+            throw new AlreadyTakenException("username taken");
+        }
+    }
+
+
+    //check is token valid
+    private void validToken(String authToken) throws DataAccessException {
+        if (dataAccess.getAuth(authToken) == null) {
+            throw new UnauthorizedException("unauthorized");
+        }
+    }
+
+
+    //store token
+    private AuthData storeToken(String username) throws DataAccessException {
+        AuthData newAuth = new AuthData(UUID.randomUUID().toString(), username);
+        dataAccess.createAuth(newAuth);
+        return newAuth;
+    }
+
 }

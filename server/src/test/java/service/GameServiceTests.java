@@ -1,5 +1,6 @@
 package service;
 
+//These are my imports
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
@@ -11,65 +12,66 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
+//Game service tests
 public class GameServiceTests {
     private GameService gameService;
     private UserService userService;
     private String authToken;
 
-    //This runs before each test to give me a fresh start
+    //fresh start before each test
     @BeforeEach
     public void setUp() throws DataAccessException, AlreadyTakenException {
         DataAccess dataAccess = new MemoryDataAccess();
         gameService = new GameService(dataAccess);
         userService = new UserService(dataAccess);
-        //Register a user to get a valid auth token
+        //register chloe to get a valid token
         AuthData auth = userService.register(new UserData("chloe", "1234", "chloe@email.com"));
         authToken = auth.authToken();
     }
 
-    //This tests that creating a game works
+    //create game works
     @Test
-    public void createGameSuccess() throws DataAccessException, UnauthorizedException, BadRequestException {
+    public void createSuccess() throws DataAccessException, UnauthorizedException, BadRequestException {
         int gameID = gameService.createGame(authToken, "myGame");
         assertTrue(gameID > 0);
     }
 
-    //This tests that creating a game with bad token fails
+    //bad token cant create game
     @Test
-    public void createGameUnauthorized() {
+    public void unauthorizedCreate() {
         assertThrows(UnauthorizedException.class, () -> gameService.createGame("badtoken", "myGame"));
     }
 
-    //This tests that listing games works
+    //list games works
     @Test
-    public void listGamesSuccess() throws DataAccessException, UnauthorizedException, BadRequestException {
+    public void listSuccess() throws DataAccessException, UnauthorizedException, BadRequestException {
         gameService.createGame(authToken, "myGame");
         List<GameData> games = gameService.listGames(authToken);
         assertEquals(1, games.size());
     }
 
-    //This tests that listing games with bad token fails
+    //bad token cant list games
     @Test
-    public void listGamesUnauthorized() {
+    public void unauthorizedList() {
         assertThrows(UnauthorizedException.class, () -> gameService.listGames("badtoken"));
     }
 
-    //This tests that joining a game works
+    //join game works
     @Test
-    public void joinGameSuccess() throws DataAccessException, UnauthorizedException, BadRequestException, AlreadyTakenException {
+    public void joinSuccess() throws DataAccessException, UnauthorizedException, BadRequestException, AlreadyTakenException {
         int gameID = gameService.createGame(authToken, "myGame");
         assertDoesNotThrow(() -> gameService.joinGame(authToken, "WHITE", gameID));
     }
 
-    //This tests that joining a taken color fails
+    //cant join taken color
     @Test
-    public void joinGameColorTaken() throws DataAccessException, UnauthorizedException, BadRequestException, AlreadyTakenException {
+    public void colorTaken() throws DataAccessException, UnauthorizedException, BadRequestException, AlreadyTakenException {
         int gameID = gameService.createGame(authToken, "myGame");
         gameService.joinGame(authToken, "WHITE", gameID);
         assertThrows(AlreadyTakenException.class, () -> gameService.joinGame(authToken, "WHITE", gameID));
     }
 
-    //This tests that clear works
+    //clear works
     @Test
     public void clearSuccess() throws DataAccessException {
         assertDoesNotThrow(() -> gameService.clear());

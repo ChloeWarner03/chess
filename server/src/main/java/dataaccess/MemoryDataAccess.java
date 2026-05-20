@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-//This stores everything in memory instead of a database
+//stores in memory
 public class MemoryDataAccess implements DataAccess {
-    //These are my data structures for storing everything
+    //data structures
     private final HashMap<String, UserData> users = new HashMap<>();
     private final HashMap<Integer, GameData> games = new HashMap<>();
     private final HashMap<String, AuthData> auths = new HashMap<>();
@@ -58,7 +58,7 @@ public class MemoryDataAccess implements DataAccess {
         auths.remove(authToken);
     }
 
-    //This wipes everything out used for testing
+    //wipes everything for testing
     public void clear() throws DataAccessException {
         users.clear();
         games.clear();

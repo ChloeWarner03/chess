@@ -1,5 +1,6 @@
 package service;
 
+//These are my imports
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
@@ -9,60 +10,56 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+//User service tests
 public class UserServiceTests {
     private UserService userService;
 
-    //This runs before each test to give me a fresh start
+    //fresh start before each test
     @BeforeEach
     public void setUp() {
         DataAccess dataAccess = new MemoryDataAccess();
         userService = new UserService(dataAccess);
     }
 
-    //This tests that register works
+    //register works
     @Test
     public void registerSuccess() throws DataAccessException, AlreadyTakenException {
-        UserData user = new UserData("chloe", "1234", "chloe@email.com");
-        AuthData result = userService.register(user);
+        AuthData result = userService.register(new UserData("chloe", "1234", "chloe@email.com"));
         assertNotNull(result.authToken());
         assertEquals("chloe", result.username());
     }
 
-    //This tests that you cant register the same username twice
+    //cant register same username twice
     @Test
     public void registerDuplicate() throws DataAccessException, AlreadyTakenException {
-        UserData user = new UserData("chloe", "1234", "chloe@email.com");
-        userService.register(user);
-        assertThrows(AlreadyTakenException.class, () -> userService.register(user));
+        userService.register(new UserData("chloe", "1234", "chloe@email.com"));
+        assertThrows(AlreadyTakenException.class, () -> userService.register(new UserData("chloe", "1234", "chloe@email.com")));
     }
 
-    //This tests that login works
+    //login works
     @Test
     public void loginSuccess() throws DataAccessException, AlreadyTakenException, UnauthorizedException {
-        UserData user = new UserData("chloe", "1234", "chloe@email.com");
-        userService.register(user);
-        AuthData result = userService.login(user);
+        userService.register(new UserData("chloe", "1234", "chloe@email.com"));
+        AuthData result = userService.login(new UserData("chloe", "1234", "chloe@email.com"));
         assertNotNull(result.authToken());
         assertEquals("chloe", result.username());
     }
 
-    //This tests that wrong password fails
+    //wrong password cant login
     @Test
     public void loginWrongPassword() throws DataAccessException, AlreadyTakenException {
-        UserData user = new UserData("chloe", "1234", "chloe@email.com");
-        userService.register(user);
+        userService.register(new UserData("chloe", "1234", "chloe@email.com"));
         assertThrows(UnauthorizedException.class, () -> userService.login(new UserData("chloe", "wrongpassword", "")));
     }
 
-    //This tests that logout works
+    //logout works
     @Test
     public void logoutSuccess() throws DataAccessException, AlreadyTakenException, UnauthorizedException {
-        UserData user = new UserData("chloe", "1234", "chloe@email.com");
-        AuthData auth = userService.register(user);
+        AuthData auth = userService.register(new UserData("chloe", "1234", "chloe@email.com"));
         assertDoesNotThrow(() -> userService.logout(auth.authToken()));
     }
 
-    //This tests that you cant logout with a bad token
+    //bad token cant logout
     @Test
     public void logoutBadToken() {
         assertThrows(UnauthorizedException.class, () -> userService.logout("badtoken"));
