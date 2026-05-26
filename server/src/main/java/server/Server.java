@@ -3,7 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryDataAccess;
+//import dataaccess.MemoryDataAccess;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import model.AuthData;
@@ -13,6 +13,7 @@ import service.BadRequestException;
 import service.GameService;
 import service.UnauthorizedException;
 import service.UserService;
+import dataaccess.SqlAccess;
 
 import java.util.Map;
 
@@ -22,13 +23,21 @@ import java.util.Map;
 public class Server {
 
     //services and data access
-    private final DataAccess dataAccess = new MemoryDataAccess();
-    private final UserService userService = new UserService(dataAccess);
-    private final GameService gameService = new GameService(dataAccess);
+    private final DataAccess dataAccess;
+    //For phase 4 I changed MemoryDataAccess to this
+    private final UserService userService;
+    private final GameService gameService;
     private final Gson gson = new Gson();
     private final Javalin javalin;
 
     public Server() {
+        try {
+            dataAccess = new SqlAccess();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        userService = new UserService(dataAccess);
+        gameService = new GameService(dataAccess);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 

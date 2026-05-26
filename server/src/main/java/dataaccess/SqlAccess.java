@@ -200,6 +200,9 @@ public class SqlAccess implements DataAccess {
 
     @Override
     public void clear() throws DataAccessException {
-
+        // wipe the slate clean
+        runUpdate("TRUNCATE TABLE auth");
+        runUpdate("TRUNCATE TABLE game");
+        runUpdate("TRUNCATE TABLE user");
     }
 }
