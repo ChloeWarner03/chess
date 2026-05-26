@@ -194,7 +194,9 @@ public class SqlAccess implements DataAccess {
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
-        //Still need to do
+        var sql = "UPDATE game SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
+        var gameJson = new Gson().toJson(game.game());
+        runUpdate(sql, game.whiteUsername(), game.blackUsername(), game.gameName(), gameJson, game.gameID());
     }
 
     @Override
