@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.Statement;
 import java.sql.Types;
+import com.google.gson.Gson;
  //encrypt
 
 import java.util.List;
@@ -58,7 +59,15 @@ public class SqlAccess implements DataAccess {
         }
     }
 
-    //helper functions toS use for these
+    //helper functions toS use for
+    private UserData readUser(java.sql.ResultSet queryResults) throws SQLException {
+        return new UserData(
+                queryResults.getString("username"),
+                queryResults.getString("password"),
+                queryResults.getString("email")
+        );
+    }
+
     private int runUpdate(String sql, Object... params) throws DataAccessException {
         try (var connection = DatabaseManager.getConnection()) {
             try (var query = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -107,11 +116,7 @@ public class SqlAccess implements DataAccess {
                 query.setString(1, username);
                 try (var queryResults = query.executeQuery()) {
                     if (queryResults.next()) {
-                        return new UserData(
-                                queryResults.getString("username"),
-                                queryResults.getString("password"),
-                                queryResults.getString("email")
-                        );
+                        return readUser(queryResults);
                     }
                 }
             }
