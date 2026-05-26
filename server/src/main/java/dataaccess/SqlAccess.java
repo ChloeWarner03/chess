@@ -207,12 +207,29 @@ public class SqlAccess implements DataAccess {
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
+        try (var connection = DatabaseManager.getConnection()) {
+            var sql = "SELECT authToken, username FROM auth WHERE authToken=?";
+            try (var query = connection.prepareStatement(sql)) {
+                query.setString(1, authToken);
+                try (var queryResults = query.executeQuery()) {
+                    if (queryResults.next()) {
+                        return new AuthData(
+                                queryResults.getString("authToken"),
+                                queryResults.getString("username")
+                        );
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to get auth: " + e.getMessage());
+        }
         return null;
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        //Still need to do
+        var sql = "DELETE FROM auth WHERE authToken=?";
+        runUpdate(sql, authToken);
     }
 
     @Override
