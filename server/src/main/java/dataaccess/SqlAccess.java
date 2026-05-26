@@ -201,7 +201,8 @@ public class SqlAccess implements DataAccess {
 
     @Override
     public void createAuth(AuthData auth) throws DataAccessException {
-    //Still need to do
+        var sql = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
+        runUpdate(sql, auth.authToken(), auth.username());
     }
 
     @Override
