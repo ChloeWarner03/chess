@@ -10,6 +10,8 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.sql.Statement;
 import java.sql.Types;
 import com.google.gson.Gson;
+import java.sql.ResultSet;
+
  //encrypt
 
 import java.util.List;
@@ -59,6 +61,20 @@ public class SqlAccess implements DataAccess {
         }
     }
 
+    //THis is the helper function for the getGame
+    //readGame
+    private GameData readGame(ResultSet queryResults) throws SQLException {
+        var gameID = queryResults.getInt("gameID");
+        var gameJson = queryResults.getString("game");
+        var game = new Gson().fromJson(gameJson, chess.ChessGame.class);
+        return new GameData(gameID,
+                queryResults.getString("whiteUsername"),
+                queryResults.getString("blackUsername"),
+                queryResults.getString("gameName"),
+                game);
+    }
+
+
     //helper functions toS use for
     private UserData readUser(java.sql.ResultSet queryResults) throws SQLException {
         return new UserData(
@@ -67,6 +83,8 @@ public class SqlAccess implements DataAccess {
                 queryResults.getString("email")
         );
     }
+
+
 
     private int runUpdate(String sql, Object... params) throws DataAccessException {
         try (var connection = DatabaseManager.getConnection()) {
@@ -99,6 +117,8 @@ public class SqlAccess implements DataAccess {
         }
     }
 
+
+    //These are the generated ones that I need to fill out
     @Override
     public void createUser(UserData user) throws DataAccessException {
         //Need to hash the passwrod with BCrypt before storing
@@ -128,11 +148,28 @@ public class SqlAccess implements DataAccess {
 
     @Override
     public int createGame(GameData game) throws DataAccessException {
-        return 0;
+        //This is in the serialize video for the chess game
+        //json for storage of it
+        var sql = "INSERT INTO game (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
+        var jsonGame = new Gson().toJson(game.game());
+        return runUpdate(sql, game.whiteUsername(), game.blackUsername(), game.gameName(), jsonGame);
     }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
+        try (var connection = DatabaseManager.getConnection()) {
+            var sql = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?";
+            try (var query = connection.prepareStatement(sql)) {
+                query.setInt( 1, gameID);//not string but instead an int, rememeber
+                try (var queryResults = query.executeQuery()) {
+                    if (queryResults.next()) {
+                        return readGame(queryResults);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to get game: " + e.getMessage());
+        }
         return null;
     }
 
