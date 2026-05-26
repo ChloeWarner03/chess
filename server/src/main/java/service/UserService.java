@@ -52,7 +52,7 @@ public class UserService {
     //check user exists and password matches
     private void checkPassword(UserData user) throws DataAccessException {
         UserData existingUser = dataAccess.getUser(user.username());
-        if (existingUser == null || !existingUser.password().equals(user.password())) {
+        if (existingUser == null || !BCrypt.checkpw(user.password(), existingUser.password())) {
             throw new UnauthorizedException("wrong password");
         }
     }
