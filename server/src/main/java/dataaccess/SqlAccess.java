@@ -6,6 +6,10 @@ import model.UserData;
 
 //imports that I added
 import java.sql.SQLException;
+import org.mindrot.jbcrypt.BCrypt;
+import java.sql.Statement;
+import java.sql.Types;
+ //encrypt
 
 import java.util.List;
 
@@ -43,9 +47,9 @@ public class SqlAccess implements DataAccess {
 
     private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
+        try (var connection = DatabaseManager.getConnection()) {
             for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
+                try (var preparedStatement = connection.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
             }
@@ -54,13 +58,66 @@ public class SqlAccess implements DataAccess {
         }
     }
 
-    @Override
-    public void createUser(UserData user) throws DataAccessException {
+    //helper functions toS use for these
+    private int runUpdate(String sql, Object... params) throws DataAccessException {
+        try (var connection = DatabaseManager.getConnection()) {
+            try (var query = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
+                // fill in the placeholders we set for ???
+                for (int i = 0; i < params.length; i++) {
+                    var param = params[i];
+                    if (param == null) {
+                        query.setNull(i + 1, Types.NULL);
+                    } else if (param instanceof String) {
+                        query.setString(i + 1, (String) param);
+                    } else if (param instanceof Integer) {
+                        query.setInt(i + 1, (Integer) param);
+                    }
+                }
+
+                // run the sql
+                query.executeUpdate();
+
+                // return the generated key if there is one
+                var queryResults= query.getGeneratedKeys();
+                if (queryResults.next()) {
+                    return queryResults.getInt(1);
+                }
+                return 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to run update: " + e.getMessage());
+        }
     }
 
     @Override
+    public void createUser(UserData user) throws DataAccessException {
+        //Need to hash the passwrod with BCrypt before storing
+        var sql = "INSERT INTO user (username, password, email) values (?, ?, ?)";
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+        runUpdate(sql, user.username(), hashedPassword, user.email());
+    }
+
+
+    @Override
     public UserData getUser(String username) throws DataAccessException {
+        try (var connection = DatabaseManager.getConnection()) {
+            var sql = "SELECT username, password, email FROM user WHERE username=?";
+            try (var query = connection.prepareStatement(sql)) {
+                query.setString(1, username);
+                try (var queryResults = query.executeQuery()) {
+                    if (queryResults.next()) {
+                        return new UserData(
+                                queryResults.getString("username"),
+                                queryResults.getString("password"),
+                                queryResults.getString("email")
+                        );
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to get user: " + e.getMessage());
+        }
         return null;
     }
 
