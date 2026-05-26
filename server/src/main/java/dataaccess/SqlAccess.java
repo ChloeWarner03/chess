@@ -4,16 +4,54 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
+//imports that I added
+import java.sql.SQLException;
+
 import java.util.List;
 
+
 public class SqlAccess implements DataAccess {
+
+    private final String[] createStatements = {
+            """
+    CREATE TABLE IF NOT EXISTS user (
+        username VARCHAR(256) NOT NULL,
+        password VARCHAR(256) NOT NULL,
+        email VARCHAR(256) NOT NULL,
+        PRIMARY KEY (username)
+    )""",
+            """
+    CREATE TABLE IF NOT EXISTS auth (
+        authToken VARCHAR(256) NOT NULL,
+        username VARCHAR(256) NOT NULL,
+        PRIMARY KEY (authToken)
+    )""",
+            """
+    CREATE TABLE IF NOT EXISTS game (
+        gameID INT NOT NULL AUTO_INCREMENT,
+        blackUsername VARCHAR(256),
+        whiteUsername VARCHAR(256),
+        gameName VARCHAR(256) NOT NULL,
+        game LONGTEXT NOT NULL,
+        PRIMARY KEY (gameID)
+    )"""
+    };
 
     public SqlAccess() throws DataAccessException {
         configureDatabase();
     }
 
     private void configureDatabase() throws DataAccessException {
-        //Neeed to impliemnt
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            for (var statement : createStatements) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to configure database: " + e.getMessage());
+        }
     }
 
     @Override
