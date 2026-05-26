@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.sql.Types;
 import com.google.gson.Gson;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 
  //encrypt
 
@@ -175,17 +176,30 @@ public class SqlAccess implements DataAccess {
 
     @Override
     public List<GameData> listGames() throws DataAccessException {
-        return List.of();
+        var games = new ArrayList<GameData>(); //epmty list
+        try (var connection = DatabaseManager.getConnection()) {
+            var sql = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game";
+            try (var query = connection.prepareStatement(sql)) {
+                try (var queryResults = query.executeQuery()) {
+                    while (queryResults.next()) { //get the next game and add to list
+                        games.add(readGame(queryResults));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to list games: " + e.getMessage());
+        }
+        return games; //all games
     }
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
-
+        //Still need to do
     }
 
     @Override
     public void createAuth(AuthData auth) throws DataAccessException {
-
+    //Still need to do
     }
 
     @Override
@@ -195,7 +209,7 @@ public class SqlAccess implements DataAccess {
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-
+        //Still need to do
     }
 
     @Override
