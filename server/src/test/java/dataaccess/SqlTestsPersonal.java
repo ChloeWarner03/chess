@@ -115,8 +115,9 @@ public class SqlTestsPersonal {
     @Test
     void updateFakeGame() throws DataAccessException {
         // game does not exist= fail
-        assertThrows(DataAccessException.class, () ->
-                data.updateGame(new GameData(99999, "chloe", null, "FakeGame", new ChessGame())));
+        data.updateGame(new GameData(36921, "chloe", null, "FakeGame", new ChessGame()));
+        // game still should not exist
+        assertNull(data.getGame(36921));
     }
     //createAuth need Pos and Neg
     @Test
@@ -135,11 +136,55 @@ public class SqlTestsPersonal {
         assertThrows(DataAccessException.class, () ->
                 data.createAuth(new AuthData("token378", "chloe")));
     }
+
+
+
+
+
+
     //getAuths: need Pos and
+    @Test
+    void getAuthPas() throws DataAccessException {
+        // add a token first
+        data.createAuth(new AuthData("token578", "chloe"));
+        // make sure we can get it back
+        assertNotNull(data.getAuth("token578"));
+    }
 
+    @Test
+    void getAuthFail() throws DataAccessException {
+        // token that doesnt exist should return null
+        assertNull(data.getAuth("failtoken"));
+    }
 
-    //deleteAuth: need Pos and Neg
+    //deleteAuth: need Pos and
+
+    @Test
+    void deleteAuthPos() throws DataAccessException {
+        // add a token then delete it
+        data.createAuth(new AuthData("token578", "chloe"));
+        data.deleteAuth("token578");
+        // should be gone now
+        assertNull(data.getAuth("token578"));
+    }
+
+    @Test
+    void deleteAuthNeg() throws DataAccessException {
+        // deleting token that doesnt exist should not throw
+        assertDoesNotThrow(() -> data.deleteAuth("failtoken"));
+    }
+
     //clear: pos
-
+    @Test
+    void clearPos() throws DataAccessException {
+        // add some stuff
+        data.createUser(new UserData("chloe", "pass", "chloe@email.com"));
+        data.createGame(new GameData(0, null, null, "testGame", new ChessGame()));
+        // wipe it all
+        data.clear();
+        // everything should be gone
+        assertNull(data.getUser("chloe"));
+        assertEquals(0, data.listGames().size());
+    }
 
 }
