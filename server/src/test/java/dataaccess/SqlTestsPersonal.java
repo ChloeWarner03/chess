@@ -1,5 +1,5 @@
 package dataaccess;
-
+//checking the errors
 //my imports
 import model.UserData;
 import org.junit.jupiter.api.*;
@@ -11,7 +11,7 @@ import model.AuthData;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class SqlTestsPersonal {
+class SqlPersonalTest {
     private static SqlAccess data;
 
     //setting it al up for the tests
@@ -66,7 +66,7 @@ public class SqlTestsPersonal {
 
     //The Game needs to have a name
     @Test
-    void gameNeedsName() throws DataAccessException {
+    void gameNeedsName() {
         // game with no name should fail
         assertThrows(DataAccessException.class, () ->
                 data.createGame(new GameData(0, null, null, null, new ChessGame())));
@@ -169,7 +169,7 @@ public class SqlTestsPersonal {
     }
 
     @Test
-    void deleteAuthNeg() throws DataAccessException {
+    void deleteAuthNeg() {
         // deleting token that doesnt exist should not throw
         assertDoesNotThrow(() -> data.deleteAuth("failtoken"));
     }
