@@ -37,6 +37,11 @@ class SqlPersonalTest {
         assertNotNull(data.getUser("chloe"));
     }
 
+    @Test
+    void getUserNeg() throws DataAccessException {
+        assertNull(data.getUser("NotRealUser"));
+    }
+
     //This test will make it so then there is no duplicates
     @Test
     void sameUser() throws DataAccessException {
