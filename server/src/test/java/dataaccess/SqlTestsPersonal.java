@@ -6,7 +6,7 @@ import org.junit.jupiter.api.*;
 import model.GameData;
 import chess.ChessGame;
 import model.AuthData;
-
+//submit for code quality
 //can this be used
 import static org.junit.jupiter.api.Assertions.*;
 
