@@ -102,8 +102,36 @@ public class ServerFacade {
 
     //logout
     public void logout(String authToken) throws Exception {
-        sendToTheServer("DELETE", "/session", null, null, authToken);
+        //sendToTheServer("DELETE", "/session", null, null, authToken);
+    }
+    //create the games
+    public int createGame(String gameName, String authToken) throws Exception {
+        var body = Map.of("gameName", gameName);
+        //record CreateResponse(int gameID) {}
+       // var response = sendToTheServer("POST", "/game", body, CreateResponse.class, authToken);
+        return response.gameID();
     }
 
+    //join the games
+    public void joinGame(int gameID, String playerColor, String authToken) throws Exception {
+        var body = Map.of(
+                "gameID",      gameID,
+                "playerColor", playerColor
+        //);
+        //sendToTheServer("PUT", "/game", body, null, authToken);
+    }
+
+    //list the games
+    public GameData[] listGames(String authToken) throws Exception {
+        record ListResponse(GameData[] games) {}
+        //var response = sendToTheServer("GET", "/game", null, ListResponse.class, authToken);
+        //return response.games();
+    }
+
+
+//clear
+    public void clear() throws Exception {
+        sendToTheServer("DELETE", "/db", null, null, null);
+    }
 
 }
