@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import ui.MakeChessBoard;
@@ -21,7 +22,7 @@ public class ChessClient {
     private String authToken = null;
     private final ServerFacade server;
     private State state = State.LOGGED_OUT;
-    private GameData[] cachedGames = new GameData[0];
+    private GameData[] savedGames = new GameData[0];
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -54,7 +55,7 @@ public class ChessClient {
                 result = eval(line);
                 System.out.print(SET_TEXT_COLOR_MAGENTA + result);
             } catch (Throwable e) {
-                var msg = e.toString();
+                var msg = e.getMessage();
                 System.out.print(msg);
             }
         }
@@ -78,11 +79,11 @@ public class ChessClient {
         } catch (NumberFormatException e) {
             throw new Exception("that is not a valid number, try again!");
         }
-        if (cachedGames.length == 0) {
+        if (savedGames.length == 0) {
             throw new Exception("run 'list' first so we can see the games!");
         }
-        if (number < 1 || number > cachedGames.length) {
-            throw new Exception("pick a number between 1 and " + cachedGames.length);
+        if (number < 1 || number > savedGames.length) {
+            throw new Exception("pick a number between 1 and " + savedGames.length);
         }
         return number;
     }
@@ -180,13 +181,23 @@ public class ChessClient {
 
     public String createGame(String... params) throws Exception {
         assertSignedIN();
-        return "";
+        if (params.length >= 1) {
+            var myGameName = String.join(" ", params);
+            server.createGame(myGameName, authToken);
+            return String.format(myGameName + "has been created");
+        }
+        throw new Exception("Expected: create <game name>");
     }
 
     public String listGames() throws Exception {
         assertSignedIN();
-        return "";
-
+        savedGames = server.listGames(authToken);
+        var result = new StringBuilder();
+        var gson = new Gson();
+        for (GameData game : savedGames) {
+            result.append(game.gameName()).append('\n');
+        }
+        return result.toString();
     }
 
     public String playGame(String... params) throws Exception {
