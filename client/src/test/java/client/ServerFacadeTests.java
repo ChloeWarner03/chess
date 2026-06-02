@@ -132,7 +132,7 @@ public class ServerFacadeTests {
         assertDoesNotThrow(() -> facade.joinGame(chloesGameID, chloesColor, chloesToken));
     }
     @Test
-    void joinGameColorTaken() throws Exception {
+    void joinGameGameDoesNotExistNegative() throws Exception {
         var chloeAuth = facade.register("chloe", "mypassword", "chloe@email.com");
         var chloesToken = chloeAuth.authToken();
         var gameThatDoesntExist = 12345;
