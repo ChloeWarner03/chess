@@ -202,7 +202,15 @@ public class ChessClient {
 
     public String playGame(String... params) throws Exception {
         assertSignedIN();
-        return "";
+        if (params.length == 2) {
+            int myGameNumber = chessVaildGameNumber(params[0]);
+            GameData myGame = savedGames[myGameNumber - 1];
+            String myColor = params[1].toUpperCase();
+            server.joinGame(myGame.gameID(), myColor, authToken);
+            MakeChessBoard.drawBoard(myGame.game() != null ? myGame.game() : new ChessGame(), myColor.equals("WHITE"));
+            return String.format("good luck in %s!" + myGame.gameName() + "You are playing color" + myColor);
+        }
+        throw new Exception("Expected: <number> <WHITE|BLACK>");
     }
 
     public String observeGame(String... params) throws Exception {
