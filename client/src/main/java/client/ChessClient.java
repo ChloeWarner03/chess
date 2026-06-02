@@ -15,7 +15,7 @@ import ui.MakeChessBoard;
 import static ui.EscapeSequences.*;
 
 
-public class ChessClient{
+public class ChessClient {
 
     private String username = null;
     private String authToken = null;
@@ -23,7 +23,7 @@ public class ChessClient{
     private State state = State.LOGGED_OUT;
     private GameData[] cachedGames = new GameData[0];
 
-    public ChessClient(String serverUrl) throws ResponseException {
+    public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
     }
 //Helpers
@@ -40,6 +40,7 @@ public class ChessClient{
         System.out.println(RESET_TEXT_COLOR + "Welcome to 240 chess. Type Help to get started." + SET_TEXT_COLOR_BLUE);
         System.out.print(help());
     }
+
     //keeps looping
     // waiting for chess users to input something
     private void welcomeChessLoop() {
@@ -68,6 +69,7 @@ public class ChessClient{
             System.out.print(RESET_TEXT_COLOR + "[" + username + "] >>> " + SET_TEXT_COLOR_RED);
         }
     }
+
     //make sure that the game number is valid before using it
     private int chessVaildGameNumber(String s) throws Exception {
         int number;
@@ -85,65 +87,117 @@ public class ChessClient{
         return number;
     }
 
+
     public String eval(String input) {
         try {
             String[] tokens = input.toLowerCase().split(" ");
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-        }
-
-        public String eval (String input){
-            try {
-                String[] tokens = input.toLowerCase().split(" ");
-                String cmd = (tokens.length > 0) ? tokens[0] : "help";
-                String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-                if (state == State.LOGGED_OUT) {
-                    return switch (cmd) {
-                        case "register" -> register(params);
-                        case "login" -> login(params);
-                        case "quit" -> "quit";
-                        default -> help();
-                    };
-                }
+            if (state == State.LOGGED_OUT) {
                 return switch (cmd) {
-                    case "logout" -> logout();
-                    case "create" -> createGame(params);
-                    case "list" -> listGames();
-                    case "play" -> playGame(params);
-                    case "observe" -> observeGame(params);
+                    case "register" -> register(params);
+                    case "login" -> login(params);
                     case "quit" -> "quit";
                     default -> help();
                 };
-            } catch (Exception e) {
-                return e.getMessage();
             }
+            return switch (cmd) {
+                case "logout" -> logout();
+                case "create" -> createGame(params);
+                case "list" -> listGames();
+                case "play" -> playGame(params);
+                case "observe" -> observeGame(params);
+                case "quit" -> "quit";
+                default -> help();
+            };
+        } catch (Exception e) {
+            return e.getMessage();
         }
+    }
 
-        //shows different commands depending on whether the user is logged in or not
-        public String help () {
-            if (state == State.LOGGED_OUT) {
-                return SET_TEXT_COLOR_BLUE + """
-                          register <USERNAME> <PASSWORD> <EMAIL> - to create an account
-                          login <USERNAME> <PASSWORD> - to play chess
-                          quit - playing chess
-                          help - with possible commands
-                        """ + RESET_TEXT_COLOR;
-            }
+    //shows different commands depending on whether the user is logged in or not
+    public String help() {
+        if (state == State.LOGGED_OUT) {
             return SET_TEXT_COLOR_BLUE + """
-                      create <NAME> - a game
-                      list - games
-                      play <NUMBER> [WHITE|BLACK] - a game
-                      observe <NUMBER> - a game
-                      logout - when you are done
+                    register <USERNAME> <PASSWORD> <EMAIL> - to create an account
+                    login <USERNAME> <PASSWORD> - to play chess
                       quit - playing chess
                       help - with possible commands
                     """ + RESET_TEXT_COLOR;
         }
+        return SET_TEXT_COLOR_BLUE + """
+                  create <NAME> - a game
+                  list - games
+                  play <NUMBER> [WHITE|BLACK] - a game
+                  observe <NUMBER> - a game
+                  logout - when you are done
+                  quit - playing chess
+                  help - with possible commands
+                """ + RESET_TEXT_COLOR;
+    }
 
-        //PRelogin UI
-        // Help, Quit, Login, Register
+    //PRelogin UI
+    // Help, Quit, Login, Register
+    public String register(String... params) throws Exception {
+        if (params.length == 3) {
+            AuthData myAuth = server.register(params[0], params[1], params[2]);
+            authToken = myAuth.authToken();
+            username = myAuth.username();
+            state = State.LOGGED_IN;
+            return String.format("You signed in as %s.", username);
+        }
+        throw new Exception("Expected: register <username> <password> <email>");
+    }
+
+    public String login(String... params) throws Exception {
+        if (params.length == 2) {
+            AuthData myAuth = server.login(params[0], params[1]);
+            authToken = myAuth.authToken();
+            username = myAuth.username();
+            state = State.LOGGED_IN;
+            return String.format("You signed in as %s.", username);
+        }
+        throw new Exception("Expected: login <username> <password>");
+    }
+
 
         //PostLogin UI
         //Help, Logout, CreateGame, ListGames, PlayGame, ObserveGame
+    private void assertSignedIN() throws Exception {
+        if (state == State.LOGGED_OUT) {
+           throw new Exception("You must loggin!");
+        }
     }
+    public String logout() throws Exception {
+            assertSignedIN();
+            server.logout(authToken);
+            var myName = username;
+            authToken = null;
+            username = null;
+            state = State.LOGGED_OUT;
+            return String.format("%s logged out.%n", myName);
+        }
+
+    public String createGame(String... params) throws Exception {
+        assertSignedIN();
+        return "";
+    }
+
+    public String listGames() throws Exception {
+        assertSignedIN();
+        return "";
+
+    }
+
+    public String playGame(String... params) throws Exception {
+        assertSignedIN();
+        return "";
+    }
+
+    public String observeGame(String... params) throws Exception {
+        assertSignedIN();
+        return "";
+    }
+}
+
 
