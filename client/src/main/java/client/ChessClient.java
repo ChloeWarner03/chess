@@ -4,6 +4,7 @@ package client;
 
 //imports
 import model.GameData;
+import ui.MakeChessBoard;
 
 import java.util.Scanner;
 
@@ -25,7 +26,7 @@ public class ChessClient {
     //Prints a prompt so then the user will know that input is needed
     private void chessUserPrompt() {
       if (state == State.LOGGED_OUT) {
-          System.out.print("\n" + RESET_TEXT_COLOR + "[LOGGED OUT] >>> " + SET_TEXT_COLOR_GREEN);
+          System.out.print("\n" + RESET_TEXT_COLOR + "[LOGGED_OUT] >>> " + SET_TEXT_COLOR_GREEN);
       } else {
           System.out.print("\n" + RESET_TEXT_COLOR + "[" + username + "] >>> " + SET_TEXT_COLOR_GREEN);
       }
@@ -65,7 +66,7 @@ public class ChessClient {
     //This makes it so then the user will know what they can do
     private void chessWelcomeMenu() {
         System.out.println(SET_TEXT_COLOR_WHITE +
-                "Welcome to Chess! Type 'help' to get started." + RESET_TEXT_COLOR);
+                "Welcome to 240 chess. Type Help to get started." + RESET_TEXT_COLOR);
         System.out.print(help());
     }
 
@@ -89,11 +90,36 @@ public class ChessClient {
         System.out.println();
     }
 
+
+    //PRelogin UI
+    // Help, Quit, Login, Register
+
+    //PostLogin UI
+    //Help, Logout, CreateGame, ListGames, PlayGame, ObserveGame
+
+
     public String eval(String input) {
         return "";
     }
 
+    //shows different commands depending on whether the user is logged in or not
     public String help() {
-        return "";
+        if (state == State.LOGGED_OUT) {
+            return SET_TEXT_COLOR_BLUE + """
+                  register <USERNAME> <PASSWORD> <EMAIL> - to create an account
+                  login <USERNAME> <PASSWORD> - to play chess
+                  quit - playing chess
+                  help - with possible commands
+                """ + RESET_TEXT_COLOR;
+        }
+        return SET_TEXT_COLOR_BLUE + """
+              create <NAME> - a game
+              list - games
+              play <NUMBER> [WHITE|BLACK] - a game
+              observe <NUMBER> - a game
+              logout - when you are done
+              quit - playing chess
+              help - with possible commands
+            """ + RESET_TEXT_COLOR;
     }
 }
