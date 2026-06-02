@@ -11,7 +11,6 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
-import ui.MakeChessBoard;
 
 import static ui.EscapeSequences.*;
 
@@ -208,14 +207,20 @@ public class ChessClient {
             String myColor = params[1].toUpperCase();
             server.joinGame(myGame.gameID(), myColor, authToken);
             MakeChessBoard.drawBoard(myGame.game() != null ? myGame.game() : new ChessGame(), myColor.equals("WHITE"));
-            return String.format("good luck in %s!" + myGame.gameName() + "You are playing color" + myColor);
+            return "joined " + myGame.gameName() + " as " + myColor + "\n";
         }
         throw new Exception("Expected: <number> <WHITE|BLACK>");
     }
 
     public String observeGame(String... params) throws Exception {
         assertSignedIN();
-        return "";
+        if (params.length == 1) {
+            int myGameNumber = chessVaildGameNumber(params[0]);
+            GameData myGame = savedGames[myGameNumber - 1];
+            MakeChessBoard.drawBoard(myGame.game() != null ? myGame.game() : new ChessGame(), true);
+            return String.format("watching %s", myGame.gameName());
+        }
+        throw new Exception("Expected: <number>");
     }
 }
 
