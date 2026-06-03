@@ -10,6 +10,7 @@ import java.util.Scanner;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
+import chess.ChessPiece;
 
 import static ui.EscapeSequences.*;
 
@@ -184,7 +185,7 @@ public class ChessClient {
         if (params.length >= 1) {
             var myGameName = String.join(" ", params);
             server.createGame(myGameName, authToken);
-            return String.format(myGameName + "has been created! Have fun playing!");
+            return String.format(myGameName + " has been created! Have fun playing!");
         }
         throw new Exception("Error, you are expected to type: create <game name>");
     }
@@ -209,7 +210,7 @@ public class ChessClient {
             GameData myGame = savedGames[myGameNumber - 1];
             String myColor = params[1].toUpperCase();
             server.joinGame(myGame.gameID(), myColor, authToken);
-            MakeChessBoard.drawBoard(myGame.game() != null ? myGame.game() : new ChessGame(), myColor.equals("WHITE"));
+            MakeChessBoard.createChessBoard(myGame.game() != null ? myGame.game() : new ChessGame(), myColor.equals("WHITE"));
             return "joined " + myGame.gameName() + " as " + myColor + "\n";
         }
         throw new Exception("Error, you are expected to type:  <number> <WHITE|BLACK>");
@@ -220,7 +221,7 @@ public class ChessClient {
         if (params.length == 1) {
             int myGameNumber = chessVaildGameNumber(params[0]);
             GameData myGame = savedGames[myGameNumber - 1];
-            MakeChessBoard.drawBoard(myGame.game() != null ? myGame.game() : new ChessGame(), true);
+            MakeChessBoard.createChessBoard(myGame.game() != null ? myGame.game() : new ChessGame(), true);
             return String.format("watching %s", myGame.gameName());
         }
         throw new Exception("Error, you are expected to type:  <number>");
