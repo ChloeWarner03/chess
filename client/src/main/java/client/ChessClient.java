@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import chess.ChessGame;
-import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 
@@ -37,7 +36,7 @@ public class ChessClient {
     //starts the program for the game of chess
     //Welcomes the user and then I need ot make it show what they can do
     private void startChessProgram() {
-        System.out.println(RESET_TEXT_COLOR + "Welcome to 240 chess. Type Help to get started." + SET_TEXT_COLOR_BLUE);
+        System.out.println(RESET_TEXT_COLOR + "Welcome to 240 chess" + SET_TEXT_COLOR_BLUE);
         System.out.print(help());
     }
 
@@ -66,20 +65,22 @@ public class ChessClient {
         if (state == State.LOGGED_OUT) {
             System.out.print(RESET_TEXT_COLOR + "[LOGGED_OUT] >>> " + SET_TEXT_COLOR_RED);
         } else {
-            System.out.print(RESET_TEXT_COLOR + "[" + username + "] >>> " + SET_TEXT_COLOR_RED);
+            System.out.print(
+                    RESET_TEXT_COLOR +
+                            "[" + username + "] (help for options) >>> " +
+                            SET_TEXT_COLOR_RED);
         }
     }
-
     //make sure that the game number is valid before using it
     private int chessVaildGameNumber(String s) throws Exception {
         int number;
         try {
             number = Integer.parseInt(s);
         } catch (NumberFormatException e) {
-            throw new Exception("that is not a valid number, try again!");
+            throw new Exception("needs to be a valid number, please try again");
         }
         if (savedGames.length == 0) {
-            throw new Exception("run 'list' first so we can see the games!");
+            throw new Exception("run 'list' first to see the games");
         }
         if (number < 1 || number > savedGames.length) {
             throw new Exception("pick a number between 1 and " + savedGames.length);
@@ -144,9 +145,9 @@ public class ChessClient {
             authToken = myAuth.authToken();
             username = myAuth.username();
             state = State.LOGGED_IN;
-            return String.format("You signed in as %s.", username);
+            return "You are signed in as " + username;
         }
-        throw new Exception("Expected: register <username> <password> <email>");
+        throw new Exception("Error, you are expected to type: register <username> <password> <email>");
     }
 
     public String login(String... params) throws Exception {
@@ -155,9 +156,9 @@ public class ChessClient {
             authToken = myAuth.authToken();
             username = myAuth.username();
             state = State.LOGGED_IN;
-            return String.format("You signed in as %s.", username);
+            return "You are signed in as " + username + " ";
         }
-        throw new Exception("Expected: login <username> <password>");
+        throw new Exception("Error, you are expected to type: login <username> <password>");
     }
 
 
@@ -165,7 +166,7 @@ public class ChessClient {
         //Help, Logout, CreateGame, ListGames, PlayGame, ObserveGame
     private void assertSignedIN() throws Exception {
         if (state == State.LOGGED_OUT) {
-           throw new Exception("You must loggin!");
+           throw new Exception("You must be logged in!");
         }
     }
     public String logout() throws Exception {
@@ -183,18 +184,20 @@ public class ChessClient {
         if (params.length >= 1) {
             var myGameName = String.join(" ", params);
             server.createGame(myGameName, authToken);
-            return String.format(myGameName + "has been created");
+            return String.format(myGameName + "has been created! Have fun playing!");
         }
-        throw new Exception("Expected: create <game name>");
+        throw new Exception("Error, you are expected to type: create <game name>");
     }
 
     public String listGames() throws Exception {
         assertSignedIN();
         savedGames = server.listGames(authToken);
         var result = new StringBuilder();
-        var gson = new Gson();
-        for (GameData game : savedGames) {
-            result.append(game.gameName()).append('\n');
+        for (int i = 0; i < savedGames.length; i++) {
+            result.append(i + 1)
+                    .append(". ")
+                    .append(savedGames[i].gameName())
+                    .append('\n');
         }
         return result.toString();
     }
@@ -209,7 +212,7 @@ public class ChessClient {
             MakeChessBoard.drawBoard(myGame.game() != null ? myGame.game() : new ChessGame(), myColor.equals("WHITE"));
             return "joined " + myGame.gameName() + " as " + myColor + "\n";
         }
-        throw new Exception("Expected: <number> <WHITE|BLACK>");
+        throw new Exception("Error, you are expected to type:  <number> <WHITE|BLACK>");
     }
 
     public String observeGame(String... params) throws Exception {
@@ -220,7 +223,7 @@ public class ChessClient {
             MakeChessBoard.drawBoard(myGame.game() != null ? myGame.game() : new ChessGame(), true);
             return String.format("watching %s", myGame.gameName());
         }
-        throw new Exception("Expected: <number>");
+        throw new Exception("Error, you are expected to type:  <number>");
     }
 }
 
