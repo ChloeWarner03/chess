@@ -40,10 +40,10 @@ public class ServerFacadeTests {
     // register
     @Test
     void registerPositive() throws Exception {
-        var chloeAuth = facade.register("chloe", "mypassword", "chloe@email.com");
-        var chloesToken = chloeAuth.authToken();
-        var chloesUsername = chloeAuth.username();
-        assertTrue(chloesToken.length() > 10);
+        var theAuth = facade.register("chloe", "mypassword", "chloe@email.com");
+        var myChessToken = theAuth.authToken();
+        var chloesUsername = theAuth.username();
+        assertTrue(myChessToken.length() > 10);
         assertEquals("chloe", chloesUsername);
     }
 
@@ -60,15 +60,15 @@ public class ServerFacadeTests {
     // These will be the test for the logout
     @Test
     void logoutPersonPositive() throws Exception {
-        var chloeAuth = facade.register("chloe", "mypassword", "chloe@email.com");
-        var chloesToken = chloeAuth.authToken();
-        assertDoesNotThrow(() -> facade.logout(chloesToken));
+        var theAuth = facade.register("chloe", "mypassword", "chloe@email.com");
+        var myChessToken = theAuth.authToken();
+        assertDoesNotThrow(() -> facade.logout(myChessToken));
     }
 
     @Test
     void thereIsBadTokenNegative() throws Exception {
-        var chloeAuth = facade.register("chloe", "mypassword", "chloe@email.com");
-        var chloesOldToken = chloeAuth.authToken();
+        var theAuth = facade.register("chloe", "mypassword", "chloe@email.com");
+        var chloesOldToken = theAuth.authToken();
         facade.logout(chloesOldToken); //logout with vaild
         assertThrows(Exception.class, () -> //dead now = fail
                 facade.logout(chloesOldToken));
@@ -80,9 +80,9 @@ public class ServerFacadeTests {
     void loginPersonPositive() throws Exception {
         facade.register("chloe", "mypassword", "chloe@email.com");
         var chloeLogin = facade.login("chloe", "mypassword");
-        var chloesToken = chloeLogin.authToken();
+        var myChessToken = chloeLogin.authToken();
         var chloesUsername = chloeLogin.username();
-        assertTrue(chloesToken.length() > 10);
+        assertTrue(myChessToken.length() > 10);
         assertEquals("chloe", chloesUsername);
     }
 
@@ -97,15 +97,15 @@ public class ServerFacadeTests {
     // these will be for listGames
     @Test
     void listTheGamesPositive() throws Exception {
-        var chloeAuth = facade.register("chloe", "mypassword", "chloe@email.com");
-        var chloesToken = chloeAuth.authToken();
+        var theAuth = facade.register("chloe", "mypassword", "chloe@email.com");
+        var myChessToken = theAuth.authToken();
         var firstGame = "my game number 1";
         var secondGame = "my game number 2";
 
-        facade.createGame(firstGame, chloesToken);
-        facade.createGame(secondGame, chloesToken);
+        facade.createGame(firstGame, myChessToken);
+        facade.createGame(secondGame, myChessToken);
 
-        GameData[] chloesGames = facade.listGames(chloesToken);
+        GameData[] chloesGames = facade.listGames(myChessToken);
         int numberOfGames = chloesGames.length;
 
         assertEquals(2, numberOfGames);
@@ -115,48 +115,48 @@ public class ServerFacadeTests {
 
     @Test
     void listTheGamesNegative() throws Exception {
-        var chloeAuth = facade.register("chloe", "mypassword", "chloe@email.com");
-        var chloesToken = chloeAuth.authToken();
-        facade.logout(chloesToken);
+        var theAuth = facade.register("chloe", "mypassword", "chloe@email.com");
+        var myChessToken = theAuth.authToken();
+        facade.logout(myChessToken);
         assertThrows(Exception.class, () -> //cant create if logged out
-                facade.listGames(chloesToken));
+                facade.listGames(myChessToken));
     }
 
     // This will be the tests for joinGame
     @Test
     void joinAGamePositive() throws Exception {
-        var chloeAuth = facade.register("chloe", "mypassword", "chloe@email.com");
-        var chloesToken = chloeAuth.authToken();
-        var chloesGameID = facade.createGame("my game number 1", chloesToken);
+        var theAuth = facade.register("chloe", "mypassword", "chloe@email.com");
+        var myChessToken = theAuth.authToken();
+        var chloesGameID = facade.createGame("my game number 1", myChessToken);
         var chloesColor = "BLACK";
-        assertDoesNotThrow(() -> facade.joinGame(chloesGameID, chloesColor, chloesToken));
+        assertDoesNotThrow(() -> facade.joinGame(chloesGameID, chloesColor, myChessToken));
     }
     @Test
     void joinGameGameDoesNotExistNegative() throws Exception {
-        var chloeAuth = facade.register("chloe", "mypassword", "chloe@email.com");
-        var chloesToken = chloeAuth.authToken();
+        var theAuth = facade.register("chloe", "mypassword", "chloe@email.com");
+        var myChessToken = theAuth.authToken();
         var gameThatDoesntExist = 12345;
         var chloesColor = "BLACK";
         assertThrows(Exception.class, () -> //should fail because 12345 was never created
-                facade.joinGame(gameThatDoesntExist, chloesColor, chloesToken));
+                facade.joinGame(gameThatDoesntExist, chloesColor, myChessToken));
     }
     // These will be for createGame
     @Test
     void createANewGamePositive() throws Exception {
-        var chloeAuth = facade.register("chloe", "mypassword", "chloe@email.com");
-        var chloesToken = chloeAuth.authToken();
+        var theAuth = facade.register("chloe", "mypassword", "chloe@email.com");
+        var myChessToken = theAuth.authToken();
         var gameName = "my chess game";
-        int chloesGameID = facade.createGame(gameName, chloesToken);
+        int chloesGameID = facade.createGame(gameName, myChessToken);
         assertTrue(chloesGameID > 0);
     }
 
     @Test
     void badAuthForCreateGameNegative() throws Exception {
-        var chloeAuth = facade.register("chloe", "mypassword", "chloe@email.com");
-        var chloesToken = chloeAuth.authToken();
-        facade.logout(chloesToken);
+        var theAuth = facade.register("chloe", "mypassword", "chloe@email.com");
+        var myChessToken = theAuth.authToken();
+        facade.logout(myChessToken);
         assertThrows(Exception.class, () -> //logged out should fail
-                facade.createGame("my chess game", chloesToken));
+                facade.createGame("my chess game", myChessToken));
     }
 
     // NEed to clear
