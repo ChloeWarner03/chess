@@ -27,14 +27,14 @@ public class MakeChessBoard {
     public static void createChessBoardCol(boolean seePinkSide) {
         String[] cols;
         if (seePinkSide) {
-            cols = new String[]{"a","b","c","d","e","f","g","h"};
+            cols = new String[]{RESET_TEXT_COLOR  + "a","b","c","d","e","f","g","h"};
         } else {
-            cols = new String[]{"h","g","f","e","d","c","b","a"};
+            cols = new String[]{RESET_TEXT_COLOR + "h","g","f","e","d","c","b","a"};
         }
         //get the spacing right
-        String border = "   ";
+        String border = "  ";
         for (String col : cols) {
-            border += " " + col + " ";}
+            border +=  "  " + col + " ";}
         System.out.println(border);
     }
 
@@ -48,15 +48,56 @@ public class MakeChessBoard {
             if ((row + col) % 2 == 0) {
                 System.out.print(SET_BG_COLOR_WHITE);
             } else {
-                System.out.print(SET_BG_COLOR_DARK_GREEN);
+                System.out.print(SET_BG_COLOR_BLACK);
             }
             System.out.print(chessPieceImages(board.getPiece(new ChessPosition(row, col))));
         }
-        System.out.println(RESET_BG_COLOR + " " + row);
+        System.out.println(RESET_BG_COLOR + RESET_TEXT_COLOR + " " + row);
     }
 
     private static String chessPieceImages(ChessPiece piece) {
-        return "";
+        if (piece == null) {
+            return EMPTY;
+        }
+
+        //FIxing the color
+
+        switch (piece.getPieceType()) {
+            case KING:
+                if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                    return SET_TEXT_COLOR_MAGENTA + WHITE_KING;
+                } else {return SET_TEXT_COLOR_BLUE + BLACK_KING;
+                }
+
+
+            case QUEEN:
+                if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                    return SET_TEXT_COLOR_MAGENTA +WHITE_QUEEN;
+                } else { return SET_TEXT_COLOR_BLUE +BLACK_QUEEN;
+                }
+
+            case BISHOP:
+                if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                    return SET_TEXT_COLOR_MAGENTA +WHITE_BISHOP;
+                } else { return SET_TEXT_COLOR_BLUE +BLACK_BISHOP;
+                }
+
+            case KNIGHT:
+                if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) { return SET_TEXT_COLOR_MAGENTA +WHITE_KNIGHT;
+                } else { return SET_TEXT_COLOR_BLUE +BLACK_KNIGHT;
+                }
+
+            case ROOK:
+                if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) { return SET_TEXT_COLOR_MAGENTA +WHITE_ROOK;
+                } else { return SET_TEXT_COLOR_BLUE +BLACK_ROOK;
+                }
+            case PAWN:
+                if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                    return SET_TEXT_COLOR_MAGENTA +WHITE_PAWN;
+                } else { return SET_TEXT_COLOR_BLUE +BLACK_PAWN;
+                }
+        }
+        return EMPTY;
     }
 
 

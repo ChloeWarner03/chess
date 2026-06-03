@@ -10,7 +10,7 @@ import java.util.Scanner;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
-import chess.ChessPiece;
+
 
 import static ui.EscapeSequences.*;
 
@@ -52,7 +52,7 @@ public class ChessClient {
 
             try {
                 result = eval(line);
-                System.out.print(SET_TEXT_COLOR_MAGENTA + result);
+                System.out.print(RESET_TEXT_COLOR + SET_TEXT_COLOR_RED + result);
             } catch (Throwable e) {
                 var msg = e.getMessage();
                 System.out.print(msg);
@@ -64,12 +64,12 @@ public class ChessClient {
     //Prints a prompt so then the user will know that input is needed
     private void chessUserPrompt() {
         if (state == State.LOGGED_OUT) {
-            System.out.print(RESET_TEXT_COLOR + "[LOGGED_OUT] >>> " + SET_TEXT_COLOR_RED);
+            System.out.print(RESET_TEXT_COLOR + "[LOGGED_OUT] >>> " + SET_TEXT_COLOR_YELLOW);
         } else {
             System.out.print(
                     RESET_TEXT_COLOR +
                             "[" + username + "] (help for options) >>> " +
-                            SET_TEXT_COLOR_RED);
+                            SET_TEXT_COLOR_YELLOW);
         }
     }
     //make sure that the game number is valid before using it
@@ -78,13 +78,13 @@ public class ChessClient {
         try {
             number = Integer.parseInt(s);
         } catch (NumberFormatException e) {
-            throw new Exception("needs to be a valid number, please try again");
+            throw new Exception(RESET_TEXT_COLOR + SET_TEXT_COLOR_BLUE + "needs to be a valid number, please try again");
         }
         if (savedGames.length == 0) {
-            throw new Exception("run 'list' first to see the games");
+            throw new Exception(RESET_TEXT_COLOR + SET_TEXT_COLOR_BLUE +"run 'list' first to see the games");
         }
         if (number < 1 || number > savedGames.length) {
-            throw new Exception("pick a number between 1 and " + savedGames.length);
+            throw new Exception(RESET_TEXT_COLOR + "pick a number between 1 and " + savedGames.length);
         }
         return number;
     }
@@ -146,9 +146,9 @@ public class ChessClient {
             authToken = myAuth.authToken();
             username = myAuth.username();
             state = State.LOGGED_IN;
-            return "You are signed in as " + username;
+            return RESET_TEXT_COLOR + "You are signed in as " + username;
         }
-        throw new Exception("Error, you are expected to type: register <username> <password> <email>");
+        throw new Exception(RESET_TEXT_COLOR + SET_TEXT_COLOR_MAGENTA +"Error, you are expected to type: register <username> <password> <email>");
     }
 
     public String login(String... params) throws Exception {
@@ -159,7 +159,7 @@ public class ChessClient {
             state = State.LOGGED_IN;
             return "You are signed in as " + username + " ";
         }
-        throw new Exception("Error, you are expected to type: login <username> <password>");
+        throw new Exception(RESET_TEXT_COLOR + SET_TEXT_COLOR_MAGENTA + "Error, you are expected to type: login <username> <password>");
     }
 
 
@@ -167,7 +167,7 @@ public class ChessClient {
         //Help, Logout, CreateGame, ListGames, PlayGame, ObserveGame
     private void assertSignedIN() throws Exception {
         if (state == State.LOGGED_OUT) {
-           throw new Exception("You must be logged in!");
+           throw new Exception(RESET_TEXT_COLOR + SET_TEXT_COLOR_MAGENTA +"You must be logged in!");
         }
     }
     public String logout() throws Exception {
@@ -177,7 +177,7 @@ public class ChessClient {
             authToken = null;
             username = null;
             state = State.LOGGED_OUT;
-            return String.format("%s logged out.%n", myName);
+            return String.format(RESET_TEXT_COLOR + "%s logged out.%n", myName);
         }
 
     public String createGame(String... params) throws Exception {
@@ -185,9 +185,9 @@ public class ChessClient {
         if (params.length >= 1) {
             var myGameName = String.join(" ", params);
             server.createGame(myGameName, authToken);
-            return String.format(myGameName + " has been created! Have fun playing!");
+            return String.format(RESET_TEXT_COLOR + myGameName + " has been created! Have fun playing!");
         }
-        throw new Exception("Error, you are expected to type: create <game name>");
+        throw new Exception(RESET_TEXT_COLOR + SET_TEXT_COLOR_MAGENTA + "Error, you are expected to type: create <game name>");
     }
 
     public String listGames() throws Exception {
@@ -213,7 +213,7 @@ public class ChessClient {
             MakeChessBoard.createChessBoard(myGame.game() != null ? myGame.game() : new ChessGame(), myColor.equals("WHITE"));
             return "joined " + myGame.gameName() + " as " + myColor + "\n";
         }
-        throw new Exception("Error, you are expected to type:  <number> <WHITE|BLACK>");
+        throw new Exception(RESET_TEXT_COLOR + SET_TEXT_COLOR_MAGENTA +"Error, you are expected to type:  <number> <WHITE|BLACK>");
     }
 
     public String observeGame(String... params) throws Exception {
@@ -224,7 +224,7 @@ public class ChessClient {
             MakeChessBoard.createChessBoard(myGame.game() != null ? myGame.game() : new ChessGame(), true);
             return String.format("watching %s", myGame.gameName());
         }
-        throw new Exception("Error, you are expected to type:  <number>");
+        throw new Exception(RESET_TEXT_COLOR + SET_TEXT_COLOR_MAGENTA +"Error, you are expected to type:  <number>");
     }
 }
 
