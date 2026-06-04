@@ -46,9 +46,9 @@ public class MakeChessBoard {
         System.out.print(" " + row + " ");
         for (int col : cols) {
             if ((row + col) % 2 == 0) {
-                System.out.print(SET_BG_COLOR_WHITE);
-            } else {
                 System.out.print(SET_BG_COLOR_BLACK);
+            } else {
+                System.out.print(SET_BG_COLOR_WHITE);
             }
             System.out.print(chessPieceImages(board.getPiece(new ChessPosition(row, col))));
         }
