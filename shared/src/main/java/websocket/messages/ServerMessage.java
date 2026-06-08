@@ -1,6 +1,7 @@
 package websocket.messages;
 
 import java.util.Objects;
+import chess.ChessGame;
 
 /**
  * Represents a Message the server can send through a WebSocket
@@ -10,6 +11,8 @@ import java.util.Objects;
  */
 public class ServerMessage {
     ServerMessageType serverMessageType;
+
+    public ServerMessage() {}
 
     //This is the override stuff from the inital code to use
 
@@ -42,9 +45,13 @@ public class ServerMessage {
 
     //ADD MY STUFF UNDER HERE: (ABOVE IS THE STARTER CODE)
     //NEED a class for the Notification, loadGame and the error
-
+    //holds a chess game and then will send it over
     public class Load_Game extends ServerMessage {
-
+        ChessGame game;
+        Load_Game(ChessGame game) {
+            this.serverMessageType = ServerMessageType.LOAD_GAME;
+            this.game = game;
+        }
     }
 
 
