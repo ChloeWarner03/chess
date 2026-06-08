@@ -1,5 +1,7 @@
 package websocket.commands;
 
+import websocket.messages.ServerMessage;
+
 import java.util.Objects;
 
 /**
@@ -9,7 +11,7 @@ import java.util.Objects;
  * methods.
  */
 public class UserGameCommand {
-
+    //This is the stuff from the starter code
     private final CommandType commandType;
 
     private final String authToken;
@@ -27,7 +29,6 @@ public class UserGameCommand {
         /** Used for a user to make a WebSocket
          * connection as a player or observer.
          */
-
         MAKE_MOVE,
         //Used to request to make a move in a game.
         LEAVE,
@@ -49,6 +50,16 @@ public class UserGameCommand {
     public Integer getGameID() {
         return gameID;
     }
+
+    public class Connect extends UserGameCommand {
+        String message;
+        Connect(String message) {
+            this.CommandType = CommandType.CONNECT;
+            this.message = message;
+        }
+    }
+
+    //Override stuff from the starter code
 
     @Override
     public boolean equals(Object o) {

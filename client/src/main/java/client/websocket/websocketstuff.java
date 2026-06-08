@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import exception.ResponseException;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
+import websocket.messages.ServerMessage;
+import websocket.commands.UserGameCommand;
 
 import jakarta.websocket.*;
 import java.io.IOException;
@@ -15,7 +17,7 @@ public class websocketstuff extends Endpoint{
     Session session;
     NotificationHandler notificationHandler;
 
-    public WebSocketStuff(String url, NotificationHandler notificationHandler) throws ResponseException {
+    public websocketstuff(String url, NotificationHandler notificationHandler) throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
@@ -41,19 +43,21 @@ public class websocketstuff extends Endpoint{
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
-
-    public void enterPetShop(String visitorName) throws ResponseException {
+    //This is connected to my stuff in the UserGameCommand
+    //CONNECT, MAKE_MOVE, LEAVE, RESIGN
+    //THis is in UserGameCommand in CommandType
+    public void connect(String visitorName) throws ResponseException {
         try {
-            var action = new Action(Action.Type.ENTER, visitorName);
+            var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, visitorName);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
     }
 
-    public void leavePetShop(String visitorName) throws ResponseException {
+    public void make_move(String visitorName) throws ResponseException {
         try {
-            var action = new Action(Action.Type.EXIT, visitorName);
+            var action = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, visitorName);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
