@@ -62,7 +62,13 @@ public class ServerMessage {
         }
     }
 
-
+    public class Notification extends ServerMessage {
+        String message;
+        Notification(String message) {
+            this.serverMessageType = ServerMessageType.NOTIFICATION;
+            this.message = message;
+        }
+    }
 
     //This is the override stuff from the inital code to use
 
