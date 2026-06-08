@@ -34,15 +34,17 @@ public class Server {
         try {
             dataAccess = new SqlAccess();
         } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e) ;
+
         }
+
         userService = new UserService(dataAccess);
         gameService = new GameService(dataAccess);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         //Endpoints
-        javalin.post("/user", this::register);
+        javalin.post("/user",  this::register);
         javalin.post("/session", this::login);
         javalin.delete("/session", this::logout);
         javalin.delete("/db", this::clear);
@@ -97,60 +99,61 @@ public class Server {
     }
 
     //Login user
-    private void login(Context ctx)
-            throws DataAccessException, UnauthorizedException {
+    private void  login(Context ctx)
+            throws DataAccessException,  UnauthorizedException {
 
         UserData user = gson.fromJson(ctx.body(), UserData.class);
-        AuthData result = userService.login(user);
+        AuthData  result = userService.login(user);
 
-        ctx.result(gson.toJson(result));
+        ctx.result (gson.toJson(result));
     }
 
     //Logout user
-    private void logout(Context ctx)
-            throws DataAccessException, UnauthorizedException {
+    private void  logout(Context ctx)
+            throws  DataAccessException, UnauthorizedException {
 
-        String authToken = ctx.header("authorization");
+        String authToken  = ctx.header("authorization");
         userService.logout(authToken);
 
         ctx.result("{}");
     }
 
     //Create
-    private void createGame(Context ctx)
-            throws DataAccessException,
-            UnauthorizedException,
+    private void createGame (Context ctx)
+            throws  DataAccessException,
+            UnauthorizedException ,
             BadRequestException {
 
         String authToken = ctx.header("authorization");
 
-        var body = gson.fromJson(ctx.body(), Map.class);
-        String gameName = (String) body.get("gameName");
+        var body =  gson.fromJson(ctx.body(), Map.class);
+        String gameName  =  (String) body.get("gameName");
 
-        int gameID = gameService.createGame(authToken, gameName);
-        ctx.result(gson.toJson(Map.of("gameID", gameID)));
+
+        int gameID  = gameService.createGame(authToken, gameName);
+        ctx.result (gson.toJson(Map.of("gameID", gameID)));
     }
 
     //List games
-    private void listGames(Context ctx)
-            throws DataAccessException,
-            UnauthorizedException {
+    private void  listGames(Context ctx)
+            throws  DataAccessException,
+            UnauthorizedException  {
 
-        String authToken = ctx.header("authorization");
-        var result = gameService.listGames(authToken);
+        String authToken =  ctx.header("authorization");
+        var result =  gameService.listGames(authToken);
 
         ctx.result(gson.toJson(Map.of("games", result)));
     }
 
     //Join a game
-    private void joinGame(Context ctx)
-            throws DataAccessException,
-            UnauthorizedException,
-            BadRequestException,
-            AlreadyTakenException {
+    private void  joinGame(Context ctx)
+            throws  DataAccessException,
+            UnauthorizedException ,
+            BadRequestException ,
+            AlreadyTakenException  {
 
         //get token
-        String authToken = ctx.header("authorization");
+        String authToken =  ctx.header("authorization");
         //get info
         var body = gson.fromJson(ctx.body(), Map.class);
         String playerColor = (String) body.get("playerColor");

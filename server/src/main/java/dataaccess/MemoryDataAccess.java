@@ -12,59 +12,65 @@ import org.mindrot.jbcrypt.BCrypt;
 //stores in memory
 public class MemoryDataAccess implements DataAccess {
     //data structures
-    private final HashMap<String, UserData> users = new HashMap<>();
-    private final HashMap<Integer, GameData> games = new HashMap<>();
-    private final HashMap<String, AuthData> auths = new HashMap<>();
+    private  final HashMap<String,  UserData> users =  new HashMap<>() ;
+    private  final HashMap<Integer,  GameData> games =  new HashMap<>() ;
+    private final HashMap<String, AuthData>  auths =  new HashMap<>();
     private int nextGameID = 1;
 
     //User stuff
-    public void createUser(UserData user) throws DataAccessException {
+    public void  makeChessUser(UserData user) throws DataAccessException {
         // lock down the password before saving, just like the database version
         String safePassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-        users.put(user.username(), new UserData(user.username(), safePassword, user.email()));
+        users.put( user.username() , new UserData(user.username(), safePassword, user.email()));
     }
 
-    public UserData getUser(String username) throws DataAccessException {
+    public UserData  getUser(String username) throws DataAccessException {
         return users.get(username);
     }
 
     //Game stuff
-    public int createGame(GameData game) throws DataAccessException {
+    public int  createGame (GameData game) throws  DataAccessException {
         int id = nextGameID++;
-        GameData newGame = new GameData(id, null, null, game.gameName(), game.game());
-        games.put(id, newGame);
-        return id;
+        GameData newGame = new  GameData(id,  null, null, game.gameName(), game.game());
+        games.put(id,  newGame) ;
+        return id ;
     }
 
-    public GameData getGame(int gameID) throws DataAccessException {
+
+    public GameData  getGame (int gameID) throws   DataAccessException {
         return games.get(gameID);
     }
 
-    public List<GameData> listGames() throws DataAccessException {
+
+
+    public List<GameData> listGames() throws  DataAccessException {
         return new ArrayList<>(games.values());
     }
 
-    public void updateGame(GameData game) throws DataAccessException {
+
+    public void updateGame(GameData game)  throws  DataAccessException {
         games.put(game.gameID(), game);
     }
 
     //Auth stuff
-    public void createAuth(AuthData auth) throws DataAccessException {
+    public void  makeAuthorization(AuthData auth) throws DataAccessException {
         auths.put(auth.authToken(), auth);
     }
 
-    public AuthData getAuth(String authToken) throws DataAccessException {
-        return auths.get(authToken);
+    public AuthData  getAuthorization(String authToken) throws DataAccessException {
+        return auths.get(authToken) ;
     }
 
-    public void deleteAuth(String authToken) throws DataAccessException {
-        auths.remove(authToken);
+    public void deleteAuthorization (String authToken) throws DataAccessException {
+        auths.remove(authToken) ;
+
+
     }
 
     //wipes everything for testing
-    public void clear() throws DataAccessException {
+    public void clear()  throws  DataAccessException {
         users.clear();
-        games.clear();
+        games.clear() ;
         auths.clear();
     }
 }

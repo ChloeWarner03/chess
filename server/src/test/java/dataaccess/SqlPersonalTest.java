@@ -27,12 +27,12 @@ class SqlPersonalTest {
         data.clear();
     }
 
-    //createUser: these will be the tests for creatUser
+    //makeChessUser: these will be the tests for creatUser
     //create a user
     @Test
     void createanewUser() throws DataAccessException {
         // add a user
-        data.createUser(new UserData("chloe", "password123", "chloe@email.com"));
+        data.makeChessUser(new UserData("chloe", "password123", "chloe@email.com"));
         // make sure they are there
         assertNotNull(data.getUser("chloe"));
     }
@@ -46,16 +46,16 @@ class SqlPersonalTest {
     @Test
     void sameUser() throws DataAccessException {
         // add a user
-        data.createUser(new UserData("chloe", "pass", "chloe@email.com"));
+        data.makeChessUser(new UserData("chloe", "pass", "chloe@email.com"));
         // adding same user should fail
         assertThrows(DataAccessException.class, () ->
-                data.createUser(new UserData("chloe", "pass", "chloe@email.com")));
+                data.makeChessUser(new UserData("chloe", "pass", "chloe@email.com")));
     }
     //grab the user
     @Test
     void grabUser() throws DataAccessException {
         // add a user first
-        data.createUser(new UserData("chloe", "pass", "chloe@email.com"));
+        data.makeChessUser(new UserData("chloe", "pass", "chloe@email.com"));
         // them find and grab them
         assertNotNull(data.getUser("chloe"));
     }
@@ -128,18 +128,18 @@ class SqlPersonalTest {
     @Test
     void createAuthentification() throws DataAccessException {
         // make an auth token
-        data.createAuth(new AuthData("token378", "chloe"));
+        data.makeAuthorization(new AuthData("token378", "chloe"));
         // make sure it is there
-        assertNotNull(data.getAuth("token378"));
+        assertNotNull(data.getAuthorization("token378"));
     }
 
     @Test
     void multipleAuth() throws DataAccessException {
         // add a token
-        data.createAuth(new AuthData("token378", "chloe"));
+        data.makeAuthorization(new AuthData("token378", "chloe"));
         // adding same token should fail
         assertThrows(DataAccessException.class, () ->
-                data.createAuth(new AuthData("token378", "chloe")));
+                data.makeAuthorization(new AuthData("token378", "chloe")));
     }
 
 
@@ -147,43 +147,43 @@ class SqlPersonalTest {
 
 
 
-    //getAuths: need Pos and
+    //getAuthorizations: need Pos and
     @Test
-    void getAuthPas() throws DataAccessException {
+    void getAuthorizationPas() throws DataAccessException {
         // add a token first
-        data.createAuth(new AuthData("token578", "chloe"));
+        data.makeAuthorization(new AuthData("token578", "chloe"));
         // make sure we can get it back
-        assertNotNull(data.getAuth("token578"));
+        assertNotNull(data.getAuthorization("token578"));
     }
 
     @Test
-    void getAuthFail() throws DataAccessException {
+    void getAuthorizationFail() throws DataAccessException {
         // token that doesnt exist should return null
-        assertNull(data.getAuth("failtoken"));
+        assertNull(data.getAuthorization("failtoken"));
     }
 
-    //deleteAuth: need Pos and
+    //deleteAuthorization: need Pos and
 
     @Test
-    void deleteAuthPos() throws DataAccessException {
+    void deleteAuthorizationPos() throws DataAccessException {
         // add a token then delete it
-        data.createAuth(new AuthData("token578", "chloe"));
-        data.deleteAuth("token578");
+        data.makeAuthorization(new AuthData("token578", "chloe"));
+        data.deleteAuthorization("token578");
         // should be gone now
-        assertNull(data.getAuth("token578"));
+        assertNull(data.getAuthorization("token578"));
     }
 
     @Test
-    void deleteAuthNeg() {
+    void deleteAuthorizationNeg() {
         // deleting token that doesnt exist should not throw
-        assertDoesNotThrow(() -> data.deleteAuth("failtoken"));
+        assertDoesNotThrow(() -> data.deleteAuthorization("failtoken"));
     }
 
     //clear: pos
     @Test
     void clearPos() throws DataAccessException {
         // add some stuff
-        data.createUser(new UserData("chloe", "pass", "chloe@email.com"));
+        data.makeChessUser(new UserData("chloe", "pass", "chloe@email.com"));
         data.createGame(new GameData(0, null, null, "testGame", new ChessGame()));
         // wipe it all
         data.clear();

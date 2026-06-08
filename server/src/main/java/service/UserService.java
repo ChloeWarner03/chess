@@ -22,7 +22,7 @@ public class UserService {
     public AuthData register(UserData newUser) throws DataAccessException {
         haveAllInfo(newUser);
         checkUsername(newUser.username());
-        dataAccess.createUser(newUser);
+        dataAccess.makeChessUser(newUser);
         return storeToken(newUser.username());
     }
 
@@ -38,7 +38,7 @@ public class UserService {
     //logout, delete token
     public void logout(String authToken) throws DataAccessException {
         validToken(authToken);
-        dataAccess.deleteAuth(authToken);
+        dataAccess.deleteAuthorization(authToken);
     }
 
 
@@ -58,7 +58,7 @@ public class UserService {
     }
     //check is token valid
     private void validToken(String authToken) throws DataAccessException {
-        if (dataAccess.getAuth(authToken) == null) {
+        if (dataAccess.getAuthorization(authToken) == null) {
             throw new UnauthorizedException("unauthorized");
         }
     }
@@ -83,7 +83,7 @@ public class UserService {
     //store token
     private AuthData storeToken(String username) throws DataAccessException {
         AuthData newAuth = new AuthData(UUID.randomUUID().toString(), username);
-        dataAccess.createAuth(newAuth);
+        dataAccess.makeAuthorization(newAuth);
         return newAuth;
     }
 

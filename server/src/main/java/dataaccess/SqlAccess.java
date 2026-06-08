@@ -45,32 +45,34 @@ public class SqlAccess implements DataAccess {
     )"""
     };
 
-    public SqlAccess() throws DataAccessException {
+    public SqlAccess() throws  DataAccessException  {
         configureDatabase();
     }
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var connection = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
-                try (var preparedStatement = connection.prepareStatement(statement)) {
+    private void configureDatabase()  throws DataAccessException  {
+        DatabaseManager.createDatabase() ;
+        try (var connection = DatabaseManager.getConnection())  {
+            for  (var  statement :  createStatements)  {
+                try  (var  preparedStatement  =  connection.prepareStatement(statement))  {
                     preparedStatement.executeUpdate();
                 }
+
             }
-        } catch (SQLException e) {
-            throw new DataAccessException("Unable to configure database: " + e.getMessage());
+        } catch (SQLException e)
+        {
+            throw new  DataAccessException ("Unable to configure database: " + e.getMessage());
         }
     }
 
     //THis is the helper function for the getGame
     //readGame
-    private GameData readGame(ResultSet queryResults) throws SQLException {
-        var gameID = queryResults.getInt("gameID");
-        var gameJson = queryResults.getString("game");
-        var game = new Gson().fromJson(gameJson, chess.ChessGame.class);
+    private GameData  readGame(ResultSet queryResults) throws SQLException {
+        var gameID =  queryResults.getInt("gameID");
+        var  gameJson = queryResults.getString("game");
+        var game = new Gson().fromJson(gameJson,  chess.ChessGame.class);
         return new GameData(gameID,
-                queryResults.getString("whiteUsername"),
-                queryResults.getString("blackUsername"),
+                queryResults.getString( "whiteUsername"),
+                queryResults.getString( "blackUsername"),
                 queryResults.getString("gameName"),
                 game);
     }
@@ -79,6 +81,7 @@ public class SqlAccess implements DataAccess {
     //helper functions toS use for
     private UserData readUser(java.sql.ResultSet queryResults) throws SQLException {
         return new UserData(
+
                 queryResults.getString("username"),
                 queryResults.getString("password"),
                 queryResults.getString("email")
@@ -87,19 +90,20 @@ public class SqlAccess implements DataAccess {
 
 
 
-    private int runUpdate(String sql, Object... params) throws DataAccessException {
-        try (var connection = DatabaseManager.getConnection()) {
-            try (var query = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+    private int runUpdate(String sql,   Object... params)  throws  DataAccessException {
+        try  (var  connection =  DatabaseManager.getConnection()) {
+            try (var query  = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
                 // fill in the placeholders we set for ???
-                for (int i = 0; i < params.length; i++) {
-                    var param = params[i];
+                for (int i =  0; i  < params.length; i++) {
+                    var param =  params[i];
                     if (param == null) {
-                        query.setNull(i + 1, Types.NULL);
+                        query.setNull  (i + 1,  Types.NULL ) ;
                     } else if (param instanceof String) {
                         query.setString(i + 1, (String) param);
-                    } else if (param instanceof Integer) {
-                        query.setInt(i + 1, (Integer) param);
+                    } else if  (param instanceof Integer)
+                    {
+                        query.setInt (i + 1, (Integer) param);
                     }
                 }
 
@@ -107,8 +111,8 @@ public class SqlAccess implements DataAccess {
                 query.executeUpdate();
 
                 // return the generated key if there is one
-                var queryResults= query.getGeneratedKeys();
-                if (queryResults.next()) {
+                var queryResults=  query.getGeneratedKeys();
+                if (queryResults.next())  {
                     return queryResults.getInt(1);
                 }
                 return 0;
@@ -121,22 +125,24 @@ public class SqlAccess implements DataAccess {
 
     //These are the generated ones that I need to fill out
     @Override
-    public void createUser(UserData user) throws DataAccessException {
+    public void makeChessUser(UserData user) throws DataAccessException {
         //Need to hash the passwrod with BCrypt before storing
-        var sql = "INSERT INTO user (username, password, email) values (?, ?, ?)";
-        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-        runUpdate(sql, user.username(), hashedPassword, user.email());
+
+
+        var sql  =  "INSERT INTO user (username, password, email) values (?, ?, ?)";
+        String hashedPassword =  BCrypt.hashpw(user.password(),  BCrypt.gensalt()) ;
+        runUpdate (sql, user.username(), hashedPassword, user.email()) ;
     }
 
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
-        try (var connection = DatabaseManager.getConnection()) {
-            var sql = "SELECT username, password, email FROM user WHERE username=?";
-            try (var query = connection.prepareStatement(sql)) {
-                query.setString(1, username);
-                try (var queryResults = query.executeQuery()) {
-                    if (queryResults.next()) {
+    public UserData getUser (String username)  throws  DataAccessException {
+        try (var  connection  =  DatabaseManager.getConnection()) {
+            var sql  =  "SELECT username, password, email FROM user WHERE username=?";
+            try (var query  =  connection.prepareStatement(sql) ) {
+                query.setString( 1, username );
+                try (var queryResults  =  query.executeQuery()) {
+                    if (queryResults.next())  {
                         return readUser(queryResults);
                     }
                 }
@@ -151,16 +157,17 @@ public class SqlAccess implements DataAccess {
     public int createGame(GameData game) throws DataAccessException {
         //This is in the serialize video for the chess game
         //json for storage of it
+
         var sql = "INSERT INTO game (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
-        var jsonGame = new Gson().toJson(game.game());
-        return runUpdate(sql, game.whiteUsername(), game.blackUsername(), game.gameName(), jsonGame);
+        var jsonGame =  new Gson().toJson(game.game());
+        return runUpdate(sql,  game.whiteUsername(), game.blackUsername(), game.gameName(), jsonGame);
     }
 
     @Override
-    public GameData getGame(int gameID) throws DataAccessException {
-        try (var connection = DatabaseManager.getConnection()) {
-            var sql = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?";
-            try (var query = connection.prepareStatement(sql)) {
+    public GameData  getGame(int gameID) throws DataAccessException {
+        try (var connection  = DatabaseManager.getConnection()) {
+            var sql  = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?";
+            try (var query =  connection.prepareStatement(sql)) {
                 query.setInt( 1, gameID);//not string but instead an int, rememeber
                 try (var queryResults = query.executeQuery()) {
                     if (queryResults.next()) {
@@ -200,13 +207,13 @@ public class SqlAccess implements DataAccess {
     }
 
     @Override
-    public void createAuth(AuthData auth) throws DataAccessException {
+    public void makeAuthorization(AuthData auth) throws DataAccessException {
         var sql = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
         runUpdate(sql, auth.authToken(), auth.username());
     }
 
     @Override
-    public AuthData getAuth(String authToken) throws DataAccessException {
+    public AuthData getAuthorization(String authToken) throws DataAccessException {
         try (var connection = DatabaseManager.getConnection()) {
             var sql = "SELECT authToken, username FROM auth WHERE authToken=?";
             try (var query = connection.prepareStatement(sql)) {
@@ -227,15 +234,16 @@ public class SqlAccess implements DataAccess {
     }
 
     @Override
-    public void deleteAuth(String authToken) throws DataAccessException {
+    public void deleteAuthorization(String authToken) throws DataAccessException {
         var sql = "DELETE FROM auth WHERE authToken=?";
+
         runUpdate(sql, authToken);
     }
 
     @Override
     public void clear() throws DataAccessException {
         // wipe the slate clean
-        runUpdate("TRUNCATE TABLE auth");
+        runUpdate( "TRUNCATE TABLE auth");
         runUpdate("TRUNCATE TABLE game");
         runUpdate("TRUNCATE TABLE user");
     }

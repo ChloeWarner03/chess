@@ -12,8 +12,6 @@ import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 import websocket.commands.UserGameCommand;
 import io.javalin.websocket.*;
-import webSocketMessages.Action;
-import webSocketMessages.Notification;
 import java.io.IOException;
 
 import java.io.IOException;
@@ -60,6 +58,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     // The client transitions back to the Post-Login UI.
     private void leaveGame(Session session, UserGameCommand command) throws IOException{
 
+        var message = String.format("%s left the shop", visitorName);
+        var notification = new Notification(Notification.Type.DEPARTURE, message);
+        connections.broadcast(session, notification);
+        connections.remove(session);
 
     }
 

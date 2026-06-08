@@ -53,7 +53,7 @@ public class GameService {
         color(playerColor);
         GameData game = getGame(gameID);
         colorisntTaken(playerColor, game);
-        AuthData auth = dataAccess.getAuth(authToken);
+        AuthData auth = dataAccess.getAuthorization(authToken);
         newGamePlayer(auth.username(), playerColor, game);
     }
 
@@ -61,7 +61,7 @@ public class GameService {
     //check is token valid
     private void validToken(String authToken) throws DataAccessException,
             UnauthorizedException {
-        if (dataAccess.getAuth(authToken) == null) {
+        if (dataAccess.getAuthorization(authToken) == null) {
             throw new UnauthorizedException("Not logged in");
         }
     }
