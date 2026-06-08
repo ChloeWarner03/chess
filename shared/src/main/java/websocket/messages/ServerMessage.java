@@ -11,10 +11,25 @@ import java.util.Objects;
 public class ServerMessage {
     ServerMessageType serverMessageType;
 
+    //This is the override stuff from the inital code to use
+
     public enum ServerMessageType {
         LOAD_GAME,
+        /** game (can be any type, just needs to be called game)
+         * Used by the server to send the current game state to a client.
+         * When a client receives this message,
+         * it will redraw the chess board.
+         */
         ERROR,
+        /** String errorMessage
+         * This message is sent to a client when it sends an invalid command.
+         * The message must include the word Error.
+         */
         NOTIFICATION
+        /** String message
+         * 	This is a message meant to inform a player
+         * 	when another player made an action.
+         */
     }
 
     public ServerMessage(ServerMessageType type) {
@@ -24,6 +39,17 @@ public class ServerMessage {
     public ServerMessageType getServerMessageType() {
         return this.serverMessageType;
     }
+
+    //ADD MY STUFF UNDER HERE: (ABOVE IS THE STARTER CODE)
+    //NEED a class for the Notification, loadGame and the error
+
+    public class Load_Game extends ServerMessage {
+
+    }
+
+
+
+    //This is the override stuff from the inital code to use
 
     @Override
     public boolean equals(Object o) {
