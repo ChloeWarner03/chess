@@ -58,7 +58,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     //Removes the user from the game (whether they are playing or observing the game).
     // The client transitions back to the Post-Login UI.
-    private void leaveGame(Session session, UserGameCommand command) {
+    private void leaveGame(Session session, UserGameCommand command) throws IOException{
 
 
     }
@@ -66,16 +66,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     //	Prompts the user to confirm they want to resign. If they do, the user forfeits the game and the game is over.
     //	Does not cause the user to leave the game.
-    private void resign(Session session, UserGameCommand command) {
+    private void resign(Session session, UserGameCommand command) throws IOException{
     }
 
     //petshop thing?
-    private void connect(Session session, UserGameCommand command) {
+    private void connect(Session session, UserGameCommand command) throws IOException{
     }
 
     //Allow the user to input what move they want to make.
     // The board is updated to reflect the result of the move,
     // and the board automatically updates on all clients involved in the game.
-    private void makeMove(Session session, UserGameCommand command, String rawMessage) {
+    private void makeMove(Session session, UserGameCommand command, String rawMessage)throws IOException {
     }
 }
