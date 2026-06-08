@@ -1,5 +1,6 @@
 package websocket.commands;
 
+import chess.ChessMove;
 import websocket.messages.ServerMessage;
 
 import java.util.Objects;
@@ -50,12 +51,13 @@ public class UserGameCommand {
     public Integer getGameID() {
         return gameID;
     }
+    //this was needed to be static
+    public static class Make_Move extends UserGameCommand {
+        ChessMove move;
 
-    public class Connect extends UserGameCommand {
-        String message;
-        Connect(String message) {
-            this.CommandType = CommandType.CONNECT;
-            this.message = message;
+        public Make_Move(String authToken, Integer gameID, ChessMove move) {
+            super(CommandType.MAKE_MOVE, authToken, gameID);
+            this.move = move;
         }
     }
 
