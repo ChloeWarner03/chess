@@ -54,6 +54,14 @@ public class ServerMessage {
         }
     }
 
+    public class Error extends ServerMessage {
+        String errorMessage;
+        Error(String errorMessage) {
+            this.serverMessageType = ServerMessageType.ERROR;
+            this.errorMessage = errorMessage;
+        }
+    }
+
 
 
     //This is the override stuff from the inital code to use
