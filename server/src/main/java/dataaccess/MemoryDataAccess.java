@@ -18,18 +18,18 @@ public class MemoryDataAccess implements DataAccess {
     private int nextGameID = 1;
 
     //User stuff
-    public void  makeChessUser(UserData user) throws DataAccessException {
+    public void  makeChessUser(UserData user) throws DataException {
         // lock down the password before saving, just like the database version
         String safePassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         users.put( user.username() , new UserData(user.username(), safePassword, user.email()));
     }
 
-    public UserData  getUser(String username) throws DataAccessException {
+    public UserData  getUser(String username) throws DataException {
         return users.get(username);
     }
 
     //Game stuff
-    public int  createGame (GameData game) throws  DataAccessException {
+    public int  createGame (GameData game) throws  DataException {
         int id = nextGameID++;
         GameData newGame = new  GameData(id,  null, null, game.gameName(), game.game());
         games.put(id,  newGame) ;
@@ -37,38 +37,38 @@ public class MemoryDataAccess implements DataAccess {
     }
 
 
-    public GameData  getGame (int gameID) throws   DataAccessException {
+    public GameData  getGame (int gameID) throws   DataException {
         return games.get(gameID);
     }
 
 
 
-    public List<GameData> listGames() throws  DataAccessException {
+    public List<GameData> listGames() throws  DataException {
         return new ArrayList<>(games.values());
     }
 
 
-    public void updateGame(GameData game)  throws  DataAccessException {
+    public void updateGame(GameData game)  throws  DataException {
         games.put(game.gameID(), game);
     }
 
     //Auth stuff
-    public void  makeAuthorization(AuthData auth) throws DataAccessException {
+    public void  makeAuthorization(AuthData auth) throws DataException {
         auths.put(auth.authToken(), auth);
     }
 
-    public AuthData  getAuthorization(String authToken) throws DataAccessException {
+    public AuthData  getAuthorization(String authToken) throws DataException {
         return auths.get(authToken) ;
     }
 
-    public void deleteAuthorization (String authToken) throws DataAccessException {
+    public void deleteAuthorization (String authToken) throws DataException {
         auths.remove(authToken) ;
 
 
     }
 
     //wipes everything for testing
-    public void clear()  throws  DataAccessException {
+    public void clear()  throws  DataException {
         users.clear();
         games.clear() ;
         auths.clear();

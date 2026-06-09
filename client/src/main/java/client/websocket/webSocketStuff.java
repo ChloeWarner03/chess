@@ -10,12 +10,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class websocketstuff extends Endpoint{
+public class webSocketStuff extends Endpoint{
 
     Session session;
     NotificationHandler notificationHandler;
 
-    public websocketstuff(String url, NotificationHandler notificationHandler) throws ResponseException {
+    public webSocketStuff(String url, NotificationHandler notificationHandler)
+            throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");

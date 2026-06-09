@@ -16,7 +16,7 @@ import websocket.commands.UserGameCommand;
 import io.javalin.websocket.*;
 import java.io.IOException;
 import dataaccess.SqlAccess;
-import dataaccess.DataAccessException;
+import dataaccess.DataException;
 
 import java.io.IOException;
 
@@ -29,7 +29,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public WebSocketHandler() {
         try {
             chessData = new SqlAccess();
-        } catch (DataAccessException e) {
+        } catch (DataException e) {
             throw new RuntimeException(e);
         }
     }
@@ -72,7 +72,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     //Removes the user from the game (whether they are playing or observing the game).
     // The client transitions back to the Post-Login UI.
     private void leaveGame(Session session, UserGameCommand command) throws IOException,
-            DataAccessException{
+            DataException{
         AuthData authorized = chessData.getAuthorization(command.getAuthToken());
         String playerUser = authorized.username();
         var message = String.format("%s left the game", playerUser);
@@ -86,7 +86,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     //	Prompts the user to confirm they want to resign. If they do, the user forfeits the game and the game is over.
     //	Does not cause the user to leave the game.
     private void resign(Session session, UserGameCommand command) throws IOException,
-            DataAccessException{
+            DataException{
         AuthData  authorized = chessData.getAuthorization(command.getAuthToken());
         model.GameData chessGame = chessData.getGame(command.getGameID());
         String  playerUser  = authorized.username();
@@ -102,7 +102,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     //petshop thing?
-    private void connect(Session session, UserGameCommand command) throws IOException, DataAccessException{
+    private void connect(Session session, UserGameCommand command) throws IOException, DataException{
         AuthData  authorized = chessData.getAuthorization(command.getAuthToken());
         model.GameData chessGame = chessData.getGame(command.getGameID());
         String  playerUser  = authorized.username();
@@ -115,7 +115,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     // The board is updated to reflect the result of the move,
     // and the board automatically updates on all clients involved in the game.
     private void makeMove( Session session,  UserGameCommand command, String rawMessage)throws IOException,
-            DataAccessException {
+            DataException {
         AuthData  authorized = chessData.getAuthorization(command.getAuthToken());
         model.GameData chessGame = chessData.getGame(command.getGameID());
         String  playerUser  = authorized.username();

@@ -2,7 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.DataAccess;
-import dataaccess.DataAccessException;
+import dataaccess.DataException;
 import model.AuthData;
 import model.GameData;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
 
 
 //Game related stuff
-public class GameService {
+public class gameplayManage {
 
     private static final String WHITE = "WHITE";
     private static final String BLACK = "BLACK";
@@ -20,18 +20,18 @@ public class GameService {
     private final DataAccess dataAccess;
 
     //get my data access
-    public GameService(DataAccess dataAccess) {
+    public gameplayManage(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
 
     //wipe everything for testing
-    public void clear() throws DataAccessException {
+    public void clear() throws DataException {
         dataAccess.clear();
     }
 
     //create game and return game ID
     public int createGame(String authToken, String gameName)
-            throws DataAccessException, UnauthorizedException, BadRequestException {
+            throws DataException, UnauthorizedException, BadRequest {
         validToken(authToken);
         gameName(gameName);
         GameData game = new GameData(0, null, null, gameName, new ChessGame());
@@ -40,15 +40,15 @@ public class GameService {
 
     //list games
     public List<GameData> listGames(String authToken)
-            throws DataAccessException, UnauthorizedException {
+            throws DataException, UnauthorizedException {
         validToken(authToken);
         return dataAccess.listGames();
     }
 
     //join game
     public void joinGame(String authToken, String playerColor, int gameID)
-            throws DataAccessException, UnauthorizedException,
-            BadRequestException, AlreadyTakenException {
+            throws DataException, UnauthorizedException,
+            BadRequest, BeenTakenException {
         validToken(authToken);
         color(playerColor);
         GameData game = getGame(gameID);
@@ -59,7 +59,7 @@ public class GameService {
 
     //Helpers!
     //check is token valid
-    private void validToken(String authToken) throws DataAccessException,
+    private void validToken(String authToken) throws DataException,
             UnauthorizedException {
         if (dataAccess.getAuthorization(authToken) == null) {
             throw new UnauthorizedException("Not logged in");
@@ -69,23 +69,23 @@ public class GameService {
     //need a game name
     private void gameName(String gameName) {
         if (gameName == null) {
-            throw new BadRequestException("You need a Game Name");
+            throw new BadRequest("You need a Game Name");
         }
     }
 
     //game? or throw
-    private GameData getGame(int gameID) throws DataAccessException,
-            BadRequestException {
+    private GameData getGame(int gameID) throws DataException,
+            BadRequest {
         GameData game = dataAccess.getGame(gameID);
         if (game == null) {
-            throw new BadRequestException("Couldn't Find Game");
+            throw new BadRequest("Couldn't Find Game");
         }
         return game;
     }
 
     //game with new player
     private void newGamePlayer(String username, String playerColor, GameData game)
-            throws DataAccessException {
+            throws DataException {
         GameData updatedGame;
         if (playerColor.equals(WHITE)) {
             updatedGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
@@ -95,12 +95,12 @@ public class GameService {
         dataAccess.updateGame(updatedGame);
     }
     //color already taken
-    private void colorisntTaken(String playerColor, GameData game) throws AlreadyTakenException {
+    private void colorisntTaken(String playerColor, GameData game) throws BeenTakenException {
         if (playerColor.equals(WHITE) && game.whiteUsername() != null) {
-            throw new AlreadyTakenException("Color is already taken");
+            throw new BeenTakenException("Color is already taken");
         }
         if (playerColor.equals(BLACK) && game.blackUsername() != null) {
-            throw new AlreadyTakenException("Color is already taken");
+            throw new BeenTakenException("Color is already taken");
         }
     }
 
@@ -108,7 +108,7 @@ public class GameService {
     private void color(String playerColor) {
         if (playerColor == null || (!playerColor.equals(WHITE)
                 && !playerColor.equals(BLACK))) {
-            throw new BadRequestException("Can't Use This Color");
+            throw new BadRequest("Can't Use This Color");
         }
     }
 

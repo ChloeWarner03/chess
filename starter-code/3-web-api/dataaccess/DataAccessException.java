@@ -3,11 +3,11 @@ package dataaccess;
 /**
  * Indicates there was an error connecting to the database
  */
-public class DataAccessException extends Exception{
-    public DataAccessException(String message) {
+public class DataException extends Exception{
+    public DataException(String message) {
         super(message);
     }
-    public DataAccessException(String message, Throwable ex) {
+    public DataException(String message, Throwable ex) {
         super(message, ex);
     }
 }

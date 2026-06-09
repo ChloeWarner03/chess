@@ -142,9 +142,9 @@ public class ChessClient{
     // Help, Quit, Login, Register
     public String register(String... params) throws Exception {
         if (params.length ==  3) {
-            AuthData myAuth =  server.register(params[0], params[1], params[2]);
-            authToken =   myAuth.authToken();
-            username =   myAuth.username();
+            AuthData gameAuthorized =  server.register(params[0], params[1], params[2]);
+            authToken =   gameAuthorized.authToken();
+            username =   gameAuthorized.username();
             state =   State.LOGGED_IN;
             return  RESET_TEXT_COLOR + "You are signed in as " + username + "\n";
         }
@@ -153,9 +153,9 @@ public class ChessClient{
 
     public String login(String... params) throws  Exception {
         if (params.length ==  2) {
-            AuthData myAuth = server.login(params[0], params[1]);
-            authToken =  myAuth.authToken();
-            username =  myAuth.username();
+            AuthData gameAuthorized = server.login(params[0], params[1]);
+            authToken =  gameAuthorized.authToken();
+            username =  gameAuthorized.username();
             state = State.LOGGED_IN;
             return "You are signed in as "  + username + " "+ "\n";
         }
@@ -165,13 +165,13 @@ public class ChessClient{
 
         //PostLogin UI
         //Help, Logout, CreateGame, ListGames, PlayGame, ObserveGame
-    private void assertSignedIN()   throws Exception {
+    private void userSignedIn()   throws Exception {
         if (state  == State.LOGGED_OUT) {
            throw  new   Exception(RESET_TEXT_COLOR + SET_TEXT_COLOR_MAGENTA +"You must be logged in!");
         }
     }
     public String logout()   throws Exception {
-            assertSignedIN();
+            userSignedIn();
             server.logout(authToken);
             var myName  = username;
             authToken =  null;
@@ -181,7 +181,7 @@ public class ChessClient{
         }
 
     public String   createGame(String... params) throws Exception {
-        assertSignedIN();
+        userSignedIn();
         if (params.length  >= 1) {
             var myGameName  = String.join(" ", params);
             server.createGame(myGameName,   authToken);
@@ -191,7 +191,7 @@ public class ChessClient{
     }
 
     public String listGames()  throws Exception {
-        assertSignedIN();
+        userSignedIn();
         savedGames  =  server.listGames(authToken);
         // no games found
         if (savedGames.length  == 0) {
@@ -221,7 +221,7 @@ public class ChessClient{
     }
 
     public String playGame(String... params) throws Exception {
-        assertSignedIN();
+        userSignedIn();
         if   (params.length == 2) {
             int   myGameNumber =   chessVaildGameNumber(params[0]);
             GameData   myGame  =   savedGames[myGameNumber - 1];
@@ -234,7 +234,7 @@ public class ChessClient{
     }
 
     public   String   observeGame(String... params)   throws   Exception {
-        assertSignedIN();
+        userSignedIn();
         if (params.length   == 1) {
             int myGameNumber   = chessVaildGameNumber(params[0]);
             GameData myGame =   savedGames[myGameNumber - 1];

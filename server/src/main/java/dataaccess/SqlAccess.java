@@ -45,11 +45,11 @@ public class SqlAccess implements DataAccess {
     )"""
     };
 
-    public SqlAccess() throws  DataAccessException  {
+    public SqlAccess() throws  DataException  {
         configureDatabase();
     }
 
-    private void configureDatabase()  throws DataAccessException  {
+    private void configureDatabase()  throws DataException  {
         DatabaseManager.createDatabase() ;
         try (var connection = DatabaseManager.getConnection())  {
             for  (var  statement :  createStatements)  {
@@ -60,7 +60,7 @@ public class SqlAccess implements DataAccess {
             }
         } catch (SQLException e)
         {
-            throw new  DataAccessException ("Unable to configure database: " + e.getMessage());
+            throw new  DataException ("Unable to configure database: " + e.getMessage());
         }
     }
 
@@ -90,7 +90,7 @@ public class SqlAccess implements DataAccess {
 
 
 
-    private int runUpdate(String sql,   Object... params)  throws  DataAccessException {
+    private int runUpdate(String sql,   Object... params)  throws  DataException {
         try  (var  connection =  DatabaseManager.getConnection()) {
             try (var query  = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -118,14 +118,14 @@ public class SqlAccess implements DataAccess {
                 return 0;
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to run update: " + e.getMessage());
+            throw new DataException("Failed to run update: " + e.getMessage());
         }
     }
 
 
     //These are the generated ones that I need to fill out
     @Override
-    public void makeChessUser(UserData user) throws DataAccessException {
+    public void makeChessUser(UserData user) throws DataException {
         //Need to hash the passwrod with BCrypt before storing
 
 
@@ -136,7 +136,7 @@ public class SqlAccess implements DataAccess {
 
 
     @Override
-    public UserData getUser (String username)  throws  DataAccessException {
+    public UserData getUser (String username)  throws  DataException {
         try (var  connection  =  DatabaseManager.getConnection()) {
             var sql  =  "SELECT username, password, email FROM user WHERE username=?";
             try (var query  =  connection.prepareStatement(sql) ) {
@@ -148,13 +148,13 @@ public class SqlAccess implements DataAccess {
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to get user: " + e.getMessage());
+            throw new DataException("Failed to get user: " + e.getMessage());
         }
         return null;
     }
 
     @Override
-    public int createGame(GameData game) throws DataAccessException {
+    public int createGame(GameData game) throws DataException {
         //This is in the serialize video for the chess game
         //json for storage of it
 
@@ -164,7 +164,7 @@ public class SqlAccess implements DataAccess {
     }
 
     @Override
-    public GameData  getGame(int gameID) throws DataAccessException {
+    public GameData  getGame(int gameID) throws DataException {
         try (var connection  = DatabaseManager.getConnection()) {
             var sql  = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?";
             try (var query =  connection.prepareStatement(sql)) {
@@ -176,13 +176,13 @@ public class SqlAccess implements DataAccess {
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to get game: " + e.getMessage());
+            throw new DataException("Failed to get game: " + e.getMessage());
         }
         return null;
     }
 
     @Override
-    public List<GameData> listGames() throws DataAccessException {
+    public List<GameData> listGames() throws DataException {
         var games = new ArrayList<GameData>(); //epmty list
         try (var connection = DatabaseManager.getConnection()) {
             var sql = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game";
@@ -194,26 +194,26 @@ public class SqlAccess implements DataAccess {
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to list games: " + e.getMessage());
+            throw new DataException("Failed to list games: " + e.getMessage());
         }
         return games; //all games
     }
 
     @Override
-    public void updateGame(GameData game) throws DataAccessException {
+    public void updateGame(GameData game) throws DataException {
         var sql = "UPDATE game SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
         var gameJson = new Gson().toJson(game.game());
         runUpdate(sql, game.whiteUsername(), game.blackUsername(), game.gameName(), gameJson, game.gameID());
     }
 
     @Override
-    public void makeAuthorization(AuthData auth) throws DataAccessException {
+    public void makeAuthorization(AuthData auth) throws DataException {
         var sql = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
         runUpdate(sql, auth.authToken(), auth.username());
     }
 
     @Override
-    public AuthData getAuthorization(String authToken) throws DataAccessException {
+    public AuthData getAuthorization(String authToken) throws DataException {
         try (var connection = DatabaseManager.getConnection()) {
             var sql = "SELECT authToken, username FROM auth WHERE authToken=?";
             try (var query = connection.prepareStatement(sql)) {
@@ -228,20 +228,20 @@ public class SqlAccess implements DataAccess {
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to get auth: " + e.getMessage());
+            throw new DataException("Failed to get auth: " + e.getMessage());
         }
         return null;
     }
 
     @Override
-    public void deleteAuthorization(String authToken) throws DataAccessException {
+    public void deleteAuthorization(String authToken) throws DataException {
         var sql = "DELETE FROM auth WHERE authToken=?";
 
         runUpdate(sql, authToken);
     }
 
     @Override
-    public void clear() throws DataAccessException {
+    public void clear() throws DataException {
         // wipe the slate clean
         runUpdate( "TRUNCATE TABLE auth");
         runUpdate("TRUNCATE TABLE game");
