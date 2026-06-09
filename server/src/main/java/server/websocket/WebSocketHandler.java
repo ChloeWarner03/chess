@@ -1,6 +1,7 @@
 package server.websocket;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccess;
 import exception.ResponseException;
 import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsCloseHandler;
@@ -8,11 +9,14 @@ import io.javalin.websocket.WsConnectContext;
 import io.javalin.websocket.WsConnectHandler;
 import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
+import model.AuthData;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 import websocket.commands.UserGameCommand;
 import io.javalin.websocket.*;
 import java.io.IOException;
+import dataaccess.SqlAccess;
+import dataaccess.DataAccessException;
 
 import java.io.IOException;
 
@@ -20,11 +24,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private final ConnectionManager connections = new ConnectionManager();
 
+    private final DataAccess chessData = new SqlAccess();
+
     @Override
     public void handleConnect(WsConnectContext ctx) {
         System.out.println("Websocket connected");
         ctx.enableAutomaticPings();
     }
+
 
     @Override
     public void handleMessage(WsMessageContext wsMessageContext) throws Exception {
@@ -56,12 +63,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     //Removes the user from the game (whether they are playing or observing the game).
     // The client transitions back to the Post-Login UI.
-    private void leaveGame(Session session, UserGameCommand command) throws IOException{
-
-        var message = String.format("%s left the shop", visitorName);
-        var notification = new Notification(Notification.Type.DEPARTURE, message);
-        connections.broadcast(session, notification);
-        connections.remove(session);
+    private void leaveGame(Session session, UserGameCommand command) throws IOException,
+            DataAccessException{
+        AuthData authorized = chessData.getAuthorization(command.getAuthToken());
+        String playerUser = authorized.username();
+        var message = String.format("%s left the game", playerUser);
+        var notification = new ServerMessage.Notification(message);
+        connections.broadcast(command.getGameID(), notification, session);
+        connections.remove(command.getGameID(), session);
 
     }
 
