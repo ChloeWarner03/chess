@@ -24,7 +24,15 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private final ConnectionManager connections = new ConnectionManager();
 
-    private final DataAccess chessData = new SqlAccess();
+
+    private final DataAccess chessData;
+    public WebSocketHandler() {
+        try {
+            chessData = new SqlAccess();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public void handleConnect(WsConnectContext ctx) {
@@ -77,16 +85,40 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     //	Prompts the user to confirm they want to resign. If they do, the user forfeits the game and the game is over.
     //	Does not cause the user to leave the game.
-    private void resign(Session session, UserGameCommand command) throws IOException{
+    private void resign(Session session, UserGameCommand command) throws IOException,
+            DataAccessException{
+        AuthData  authorized = chessData.getAuthorization(command.getAuthToken());
+        model.GameData chessGame = chessData.getGame(command.getGameID());
+        String  playerUser  = authorized.username();
+
+        chessGame.game().setTeamTurn(null);
+        chessData.updateGame(chessGame);
+
+        var message =  String.format("%s resigned the game", playerUser);
+        var notification =  new ServerMessage.Notification(message);
+        connections.broadcast (command.getGameID(),  notification, null);
+
+
     }
 
     //petshop thing?
-    private void connect(Session session, UserGameCommand command) throws IOException{
+    private void connect(Session session, UserGameCommand command) throws IOException, DataAccessException{
+        AuthData  authorized = chessData.getAuthorization(command.getAuthToken());
+        model.GameData chessGame = chessData.getGame(command.getGameID());
+        String  playerUser  = authorized.username();
+
+
+
     }
 
     //Allow the user to input what move they want to make.
     // The board is updated to reflect the result of the move,
     // and the board automatically updates on all clients involved in the game.
-    private void makeMove(Session session, UserGameCommand command, String rawMessage)throws IOException {
+    private void makeMove( Session session,  UserGameCommand command, String rawMessage)throws IOException,
+            DataAccessException {
+        AuthData  authorized = chessData.getAuthorization(command.getAuthToken());
+        model.GameData chessGame = chessData.getGame(command.getGameID());
+        String  playerUser  = authorized.username();
+
     }
 }
