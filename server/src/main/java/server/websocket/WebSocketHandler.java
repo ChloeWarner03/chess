@@ -1,5 +1,6 @@
 package server.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import exception.ResponseException;
@@ -17,6 +18,7 @@ import io.javalin.websocket.*;
 import java.io.IOException;
 import dataaccess.SqlAccess;
 import dataaccess.DataException;
+
 
 import java.io.IOException;
 
@@ -107,18 +109,108 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         model.GameData chessGame = chessData.getGame(command.getGameID());
         String  playerUser  = authorized.username();
 
+        var loadGame = new ServerMessage.Load_Game(chessGame.game());
+        session.getRemote().sendString(new Gson().toJson(loadGame));
 
-
+        // tell everyone else who joined
+        String myRole;
+        if (playerUser.equals(chessGame.whiteUsername())) {
+            myRole = "white";
+        } else if (playerUser.equals(chessGame.blackUsername())) {
+            myRole = "black";
+        } else {
+            myRole = "an observer";
+        }
+        var notification = new ServerMessage.Notification(playerUser + " joined as " + myRole);
+        connections.broadcast(command.getGameID(), notification, session);
     }
+
 
     //Allow the user to input what move they want to make.
     // The board is updated to reflect the result of the move,
     // and the board automatically updates on all clients involved in the game.
-    private void makeMove( Session session,  UserGameCommand command, String rawMessage)throws IOException,
-            DataException {
-        AuthData  authorized = chessData.getAuthorization(command.getAuthToken());
-        model.GameData chessGame = chessData.getGame(command.getGameID());
-        String  playerUser  = authorized.username();
+    private void makeMove(Session session, UserGameCommand command, String rawMessage)
+            throws IOException, DataException {
 
+        AuthData auth = chessData.getAuthorization(command.getAuthToken());
+        model.GameData game = chessData.getGame(command.getGameID());
+
+        UserGameCommand.Make_Move move =
+                new Gson().fromJson(rawMessage, UserGameCommand.Make_Move.class);
+
+        try {
+            makeTheMove(game, move);
+        } catch (chess.InvalidMoveException e) {
+            session.getRemote().sendString(new Gson().toJson(
+                    new ServerMessage.Error("Error: " + e.getMessage())));
+            return;
+        }
+
+        updateBoard(command.getGameID(), game, auth.username(), move);
+        checkGame(command.getGameID(), game);
     }
+
+    //Helpers
+
+    private void makeTheMove(model.GameData game,
+                             UserGameCommand.Make_Move move)
+            throws chess.InvalidMoveException {
+
+        game.game().makeMove(move.move);
+    }
+
+    private void updateBoard(int gameID, model.GameData game,
+                             String username, UserGameCommand.Make_Move move)
+            throws DataException {
+
+        chessData.updateGame(game);
+
+        try {
+            connections.broadcast(gameID,
+                    new ServerMessage.Load_Game(game.game()), null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            connections.broadcast(gameID,
+                    new ServerMessage.Notification(
+                            username + " moved " + move.move),
+                    null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void checkGame(int gameID, model.GameData game)
+            throws IOException, DataException {
+
+        ChessGame.TeamColor otherplayer = game.game().getTeamTurn();
+
+        if (game.game().isInCheckmate(otherplayer)) {
+            game.game().setTeamTurn(null);
+            chessData.updateGame(game);
+
+            connections.broadcast(gameID,
+                    new ServerMessage.Notification( "Player" +
+                            otherplayer + " is in checkmate! Good Game!"),
+                    null);
+        }
+        else if (game.game().isInStalemate(otherplayer)) {
+            game.game().setTeamTurn(null);
+            chessData.updateGame(game);
+
+            connections.broadcast(gameID,
+                    new ServerMessage.Notification(
+                            "It is a Stalemate! Good Game!"),
+                    null);
+        }
+        else if (game.game().isInCheck(otherplayer)) {
+            connections.broadcast(gameID,
+                    new ServerMessage.Notification( "Player" +
+                            otherplayer + " is in check"),
+                    null);
+        }
+    }
+
 }

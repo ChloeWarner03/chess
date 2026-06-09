@@ -10,12 +10,18 @@ import java.util.Map;
 
 public class  ServerFacade {
     private final String myUrlForServer;
+
+
     private  final Gson gson = new Gson();
     public  ServerFacade(int  port) {
         myUrlForServer =  "http://localhost:" + port;
     }
     public ServerFacade(String  url) {
         myUrlForServer  = url;
+    }
+
+    public String getTheServerURL() {
+        return myUrlForServer;
     }
 
     //helpers (need ot make better, personal)

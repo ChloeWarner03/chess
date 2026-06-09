@@ -53,7 +53,7 @@ public class UserGameCommand {
     }
     //this was needed to be static
     public static class Make_Move extends UserGameCommand {
-        ChessMove move;
+        public ChessMove move;
 
         public Make_Move(String authToken, Integer gameID, ChessMove move) {
             super(CommandType.MAKE_MOVE, authToken, gameID);

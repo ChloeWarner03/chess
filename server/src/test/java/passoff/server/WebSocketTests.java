@@ -135,7 +135,7 @@ public class WebSocketTests {
 
     @Test
     @Order(5)
-    @DisplayName("Make Move for Opponent")
+    @DisplayName("Make Move for otherplayer")
     public void invalidMoveOpponent() {
         setupNormalGame();
 

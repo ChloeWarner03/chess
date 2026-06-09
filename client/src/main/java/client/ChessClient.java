@@ -8,14 +8,17 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import chess.ChessGame;
+import client.websocket.NotificationHandler;
+import client.websocket.WebSocketFacade;
 import model.AuthData;
 import model.GameData;
+import websocket.messages.ServerMessage;
 
 
 import static ui.EscapeSequences.*;
 
 
-public class ChessClient{
+public class ChessClient implements NotificationHandler {
 
     private String username  =  null;
     private String authToken   = null;
@@ -26,6 +29,15 @@ public class ChessClient{
     public ChessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
     }
+
+
+    //websocket
+
+    private WebSocketFacade gamewebsocket;
+    private ChessGame currentGame;
+    private int openGameNumber;
+    private String yourColor;
+
 //Helpers
 
     //In the game I need to start the program, welcome them and then keep it going
@@ -227,6 +239,13 @@ public class ChessClient{
             GameData   myGame  =   savedGames[myGameNumber - 1];
             String myColor = params[1].toUpperCase();
             server.joinGame(myGame.gameID(), myColor, authToken);
+
+            //Adding in the websocket stuff here
+            openGameNumber = myGame.gameID();
+            yourColor = myColor;
+            gamewebsocket = new WebSocketFacade(server.getTheServerURL(), this);
+            gamewebsocket.connect(authToken, openGameNumber);
+
             MakeChessBoard.createChessBoard(myGame.game()   != null ? myGame.game() : new ChessGame(), myColor.equals("WHITE"));
             return "joined "   + myGame.gameName() + " as " + myColor + "\n";
         }
@@ -242,6 +261,11 @@ public class ChessClient{
             return   String.format("watching %s\n",   myGame.gameName());
         }
         throw   new   Exception(RESET_TEXT_COLOR + SET_TEXT_COLOR_MAGENTA +"Error, you are expected to type:  <number>"+ "\n");
+    }
+
+    @Override
+    public void notify(ServerMessage notification) {
+
     }
 }
 
