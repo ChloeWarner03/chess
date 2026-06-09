@@ -18,6 +18,7 @@ import io.javalin.websocket.*;
 import java.io.IOException;
 import dataaccess.SqlAccess;
 import dataaccess.DataException;
+import org.eclipse.jetty.websocket.api.Session;
 
 
 import java.io.IOException;
@@ -76,7 +77,21 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void leaveGame(Session session, UserGameCommand command) throws IOException,
             DataException{
         AuthData authorized = chessData.getAuthorization(command.getAuthToken());
+        model.GameData chessGame = chessData.getGame(command.getGameID());
         String playerUser = authorized.username();
+
+        // clear their spot so someone else can join
+        if (playerUser.equals(chessGame.whiteUsername())) {
+            chessGame = new model.GameData(chessGame.gameID(), null,
+                    chessGame.blackUsername(), chessGame.gameName(), chessGame.game());
+            chessData.updateGame(chessGame);
+        } else if (playerUser.equals(chessGame.blackUsername())) {
+            chessGame = new model.GameData(chessGame.gameID(), chessGame.whiteUsername(),
+                    null, chessGame.gameName(), chessGame.game());
+            chessData.updateGame(chessGame);
+        }
+
+
         var message = String.format("%s left the game", playerUser);
         var notification = new ServerMessage.Notification(message);
         connections.broadcast(command.getGameID(), notification, session);
@@ -93,6 +108,20 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         model.GameData chessGame = chessData.getGame(command.getGameID());
         String  playerUser  = authorized.username();
 
+        // observer check
+        if (isObserver(playerUser, chessGame)) {
+            session.getRemote().sendString(new Gson().toJson(
+                    new ServerMessage.Error("Error: observers cannot resign")));
+            return;
+        }
+
+        // game already over check
+        if (chessGame.game().getTeamTurn() == null) {
+            session.getRemote().sendString(new Gson().toJson(
+                    new ServerMessage.Error("Error: game is already over")));
+            return;
+        }
+
         chessGame.game().setTeamTurn(null);
         chessData.updateGame(chessGame);
 
@@ -100,19 +129,38 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         var notification =  new ServerMessage.Notification(message);
         connections.broadcast (command.getGameID(),  notification, null);
 
+        chessGame.game().setTeamTurn(null);
+        chessData.updateGame(chessGame);
+        System.out.println("after resign teamTurn: " + chessGame.game().getTeamTurn());
+
 
     }
 
-    //petshop thing?
-    private void connect(Session session, UserGameCommand command) throws IOException, DataException{
-        AuthData  authorized = chessData.getAuthorization(command.getAuthToken());
-        model.GameData chessGame = chessData.getGame(command.getGameID());
-        String  playerUser  = authorized.username();
 
+    private boolean isObserver(String username, model.GameData game) {
+        return !username.equals(game.whiteUsername()) && !username.equals(game.blackUsername());
+    }
+
+    //petshop thing?
+    private void connect(Session session, UserGameCommand command) throws IOException, DataException {
+        AuthData authorized = chessData.getAuthorization(command.getAuthToken());
+        if (authorized == null) {
+            session.getRemote().sendString(new Gson().toJson(
+                    new ServerMessage.Error("Error: invalid auth token")));
+            return;
+        }
+
+        model.GameData chessGame = chessData.getGame(command.getGameID());
+        if (chessGame == null) {
+            session.getRemote().sendString(new Gson().toJson(
+                    new ServerMessage.Error("Error: game not found")));
+            return;
+        }
+
+        String playerUser = authorized.username();
         var loadGame = new ServerMessage.Load_Game(chessGame.game());
         session.getRemote().sendString(new Gson().toJson(loadGame));
 
-        // tell everyone else who joined
         String myRole;
         if (playerUser.equals(chessGame.whiteUsername())) {
             myRole = "white";
@@ -133,7 +181,33 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             throws IOException, DataException {
 
         AuthData auth = chessData.getAuthorization(command.getAuthToken());
+        if (auth == null) {
+            session.getRemote().sendString(new Gson().toJson(
+                    new ServerMessage.Error("Error: invalid auth token")));
+            return;
+        }
+
         model.GameData game = chessData.getGame(command.getGameID());
+        if (game == null) {
+            session.getRemote().sendString(new Gson().toJson(
+                    new ServerMessage.Error("Error: game not found")));
+            return;
+        }
+
+        if (isObserver(auth.username(), game)) {
+            session.getRemote().sendString(new Gson().toJson(
+                    new ServerMessage.Error("Error: observers cannot make moves")));
+            return;
+        }
+
+        ChessGame.TeamColor myColor = auth.username().equals(game.whiteUsername()) ?
+                ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+
+        if (game.game().getTeamTurn() == null || game.game().getTeamTurn() != myColor) {
+            String msg = game.game().getTeamTurn() == null ? "Error: game is already over" : "Error: not your turn";
+            session.getRemote().sendString(new Gson().toJson(new ServerMessage.Error(msg)));
+            return;
+        }
 
         UserGameCommand.Make_Move move =
                 new Gson().fromJson(rawMessage, UserGameCommand.Make_Move.class);
@@ -146,11 +220,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;
         }
 
-        updateBoard(command.getGameID(), game, auth.username(), move);
+        updateBoard(command.getGameID(), game, auth.username(), move, session);
         checkGame(command.getGameID(), game);
+
+
+        System.out.println("makeMove teamTurn from db: " + game.game().getTeamTurn());
     }
 
-    //Helpers
+        //Helpers
 
     private void makeTheMove(model.GameData game,
                              UserGameCommand.Make_Move move)
@@ -160,7 +237,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void updateBoard(int gameID, model.GameData game,
-                             String username, UserGameCommand.Make_Move move)
+                             String username, UserGameCommand.Make_Move move, Session session)
             throws DataException {
 
         chessData.updateGame(game);
@@ -175,8 +252,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         try {
             connections.broadcast(gameID,
                     new ServerMessage.Notification(
-                            username + " moved " + move.move),
-                    null);
+                            username + " made a move " + move.move),
+                    session);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -212,5 +289,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     null);
         }
     }
+
+
+
 
 }

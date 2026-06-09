@@ -15,6 +15,8 @@ import model.GameData;
 import websocket.messages.ServerMessage;
 
 
+
+
 import static ui.EscapeSequences.*;
 
 
@@ -232,6 +234,8 @@ public class ChessClient implements NotificationHandler {
         return result.toString().stripTrailing() + "\n";
     }
 
+    private GameplayUI gameplayUI;
+
     public String playGame(String... params) throws Exception {
         userSignedIn();
         if   (params.length == 2) {
@@ -244,6 +248,11 @@ public class ChessClient implements NotificationHandler {
             openGameNumber = myGame.gameID();
             yourColor = myColor;
             gamewebsocket = new WebSocketFacade(server.getTheServerURL(), this);
+
+            gamewebsocket.connect(authToken, openGameNumber);
+            gameplayUI.run();
+
+
             gamewebsocket.connect(authToken, openGameNumber);
 
             MakeChessBoard.createChessBoard(myGame.game()   != null ? myGame.game() : new ChessGame(), myColor.equals("WHITE"));
@@ -265,7 +274,9 @@ public class ChessClient implements NotificationHandler {
 
     @Override
     public void notify(ServerMessage notification) {
-
+        if (gameplayUI != null) {
+            gameplayUI.handleMessage(notification);
+        }
     }
 }
 

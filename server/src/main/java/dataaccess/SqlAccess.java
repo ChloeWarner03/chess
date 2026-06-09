@@ -12,6 +12,7 @@ import java.sql.Types;
 import com.google.gson.Gson;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import com.google.gson.GsonBuilder;
 
 //trying to get code qaultiy to work
 
@@ -136,6 +137,13 @@ public class SqlAccess implements DataAccess {
 
 
     @Override
+    public void updateGame(GameData game) throws DataException {
+        var sql = "UPDATE game SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
+        var gameJson = new GsonBuilder().serializeNulls().create().toJson(game.game());
+        runUpdate(sql, game.whiteUsername(), game.blackUsername(), game.gameName(), gameJson, game.gameID());
+    }
+
+    @Override
     public UserData getUser (String username)  throws  DataException {
         try (var  connection  =  DatabaseManager.getConnection()) {
             var sql  =  "SELECT username, password, email FROM user WHERE username=?";
@@ -197,13 +205,6 @@ public class SqlAccess implements DataAccess {
             throw new DataException("Failed to list games: " + e.getMessage());
         }
         return games; //all games
-    }
-
-    @Override
-    public void updateGame(GameData game) throws DataException {
-        var sql = "UPDATE game SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
-        var gameJson = new Gson().toJson(game.game());
-        runUpdate(sql, game.whiteUsername(), game.blackUsername(), game.gameName(), gameJson, game.gameID());
     }
 
     @Override

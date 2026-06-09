@@ -13,6 +13,7 @@ import service.gameplayManage;
 import service.UnauthorizedException;
 import service.userManage;
 import dataaccess.SqlAccess;
+import server.websocket.WebSocketHandler;
 
 import java.util.Map;
 
@@ -51,6 +52,13 @@ public class Server {
         javalin.post("/game", this::createGame);
         javalin.get("/game", this::listGames);
         javalin.put("/game", this::joinGame);
+
+        javalin.ws("/ws", ws -> {
+            WebSocketHandler webSocketHandler = new WebSocketHandler();
+            ws.onConnect(webSocketHandler::handleConnect);
+            ws.onMessage(webSocketHandler::handleMessage);
+            ws.onClose(webSocketHandler::handleClose);
+        });
 
         //Exception handlers
         javalin.exception(UnauthorizedException.class, (e, ctx) -> {

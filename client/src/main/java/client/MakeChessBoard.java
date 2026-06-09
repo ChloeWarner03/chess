@@ -24,6 +24,66 @@ public class MakeChessBoard {
         createChessBoardCol(seePinkSide);
     }
 
+
+    //THis is part of phase 6
+
+    public static void highlightMoves(ChessGame game, String square, boolean seePinkSide) {
+        int col = square.charAt(0) - 'a' + 1;
+        int row = square.charAt(1) - '0';
+        ChessPosition myPosition = new ChessPosition(row, col);
+
+        // get all the spots this piece can go
+        java.util.HashSet<ChessPosition> highlighted = new java.util.HashSet<>();
+        var legalMoves = game.validMoves(myPosition);
+        if (legalMoves != null) {
+            for (chess.ChessMove move : legalMoves) {
+                highlighted.add(move.getEndPosition());
+            }
+        }
+
+        // draw the board with the highlights
+        ChessBoard board = game.getBoard();
+        createChessBoardCol(seePinkSide);
+        if (seePinkSide) {
+            for (int r = 8; r >= 1; r--) {
+                highlightRow(board, r, true, highlighted, myPosition);
+            }
+        } else {
+            for (int r = 1; r <= 8; r++) {
+                highlightRow(board, r, false, highlighted, myPosition);
+            }
+        }
+        createChessBoardCol(seePinkSide);
+    }
+
+    private static void highlightRow(ChessBoard board, int row, boolean seePinkSide,
+                                     java.util.HashSet<ChessPosition> highlighted,
+                                     ChessPosition selected) {
+        int[] cols;
+        if (seePinkSide) {
+            cols = new int[]{1, 2, 3, 4, 5, 6, 7, 8};
+        } else {
+            cols = new int[]{8, 7, 6, 5, 4, 3, 2, 1};
+        }
+
+        System.out.print(" " + row + " ");
+        for (int col : cols) {
+            ChessPosition pos = new ChessPosition(row, col);
+            if (pos.equals(selected)) {
+                System.out.print(SET_BG_COLOR_YELLOW);         // selected piece
+            } else if (highlighted.contains(pos)) {
+                System.out.print(SET_BG_COLOR_GREEN);          // can move here
+            } else if ((row + col) % 2 == 0) {
+                System.out.print(SET_BG_COLOR_BLACK);          // normal dark square
+            } else {
+                System.out.print(SET_BG_COLOR_WHITE);          // normal light square
+            }
+            System.out.print(chessPieceImages(board.getPiece(pos)));
+        }
+        System.out.println(RESET_BG_COLOR + RESET_TEXT_COLOR + " " + row);
+    }
+
+
     public static  void  createChessBoardCol(boolean  seePinkSide) {
         String[]  cols;
         if  (seePinkSide) {

@@ -34,6 +34,8 @@ public class WebSocketFacade extends Endpoint{
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
+            System.out.println("WEBSOCKET ERROR: " + ex.getMessage());
+            ex.printStackTrace();
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
     }
