@@ -233,3 +233,4 @@ public class GameStatusTests {
         Assertions.assertFalse(game.isInStalemate(ChessGame.TeamColor.BLACK), INCORRECT_BLACK_STALEMATE);
     }
 }
+

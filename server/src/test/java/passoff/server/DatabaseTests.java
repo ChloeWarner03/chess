@@ -95,9 +95,9 @@ public class DatabaseTests {
     @Order(3)
     public void databaseErrorHandling() throws ReflectiveOperationException {
         /*
-        This test simulates an interruption in connecting to MySQL after the server is already running (it started with 
-        MySQL working normally). If this happens, this should be considered an "Internal Server Error" and the response 
-        code for any endpoint which no longer can do what it needs to do (which for this project should be all of them) 
+        This test simulates an interruption in connecting to MySQL after the server is already running (it started with
+        MySQL working normally). If this happens, this should be considered an "Internal Server Error" and the response
+        code for any endpoint which no longer can do what it needs to do (which for this project should be all of them)
         should be 500. The body of each of these responses should include a reasonable, relevant error message.
          */
         Properties fakeDbProperties = new Properties();
@@ -130,10 +130,9 @@ public class DatabaseTests {
                 TestResult result = operation.get();
                 Assertions.assertEquals(500, serverFacade.getStatusCode(),
                         "Server response code was not 500 Internal Error for " + operationName);
-                String errorMessage = result.getMessage();
-                Assertions.assertNotNull(errorMessage, "Invalid Request didn't return an error message for " + operationName);
-                Assertions.assertTrue(errorMessage.toLowerCase(Locale.ROOT).contains("error"),
-                        String.format("Error message didn't contain the word \"Error\" for %s. Error message: \"%s\"", operationName, errorMessage));
+                Assertions.assertNotNull(result.getMessage(), "Invalid Request didn't return an error message for " + operationName);
+                Assertions.assertTrue(result.getMessage().toLowerCase(Locale.ROOT).contains("error"),
+                        "Error message didn't contain the word \"Error\" for " + operationName);
             }
         } finally {
             Method loadFromResources = databaseManagerClass.getDeclaredMethod("loadPropertiesFromResources");
