@@ -4,6 +4,7 @@ import chess.ChessBoard;
 import static ui.EscapeSequences.*;
 import chess.ChessPosition;
 import chess.ChessPiece;
+import chess.*;
 
 
 
@@ -26,22 +27,19 @@ public class MakeChessBoard {
 
 
     //THis is part of phase 6
-
     public static void highlightMoves(ChessGame game, String square, boolean seePinkSide) {
         int col = square.charAt(0) - 'a' + 1;
         int row = square.charAt(1) - '0';
         ChessPosition myPosition = new ChessPosition(row, col);
 
-        // get all the spots this piece can go
         java.util.HashSet<ChessPosition> highlighted = new java.util.HashSet<>();
         var legalMoves = game.validMoves(myPosition);
         if (legalMoves != null) {
-            for (chess.ChessMove move : legalMoves) {
+            for (ChessMove move : legalMoves) {
                 highlighted.add(move.getEndPosition());
             }
         }
 
-        // draw the board with the highlights
         ChessBoard board = game.getBoard();
         createChessBoardCol(seePinkSide);
         if (seePinkSide) {
@@ -70,13 +68,13 @@ public class MakeChessBoard {
         for (int col : cols) {
             ChessPosition pos = new ChessPosition(row, col);
             if (pos.equals(selected)) {
-                System.out.print(SET_BG_COLOR_YELLOW);         // selected piece
+                System.out.print(SET_BG_COLOR_YELLOW);
             } else if (highlighted.contains(pos)) {
-                System.out.print(SET_BG_COLOR_GREEN);          // can move here
+                System.out.print(SET_BG_COLOR_GREEN);
             } else if ((row + col) % 2 == 0) {
-                System.out.print(SET_BG_COLOR_BLACK);          // normal dark square
+                System.out.print(SET_BG_COLOR_BLACK);
             } else {
-                System.out.print(SET_BG_COLOR_WHITE);          // normal light square
+                System.out.print(SET_BG_COLOR_WHITE);
             }
             System.out.print(chessPieceImages(board.getPiece(pos)));
         }
