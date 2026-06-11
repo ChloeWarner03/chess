@@ -11,14 +11,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 //User service tests
-class userManageTests {
-    private userManage userManage;
+class UserManageTests {
+    private UserManage userManage;
 
     //fresh start before each test
     @BeforeEach
     void setUp() {
         DataAccess dataAccess = new MemoryDataAccess();
-        userManage = new userManage(dataAccess);
+        userManage = new UserManage(dataAccess);
     }
 
     //register works

@@ -9,11 +9,11 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.util.UUID;
 
 //User related stuff
-public class userManage {
+public class UserManage {
     private final DataAccess dataAccess;
 
     //Get my data access
-    public userManage(DataAccess dataAccess) {
+    public UserManage(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
 

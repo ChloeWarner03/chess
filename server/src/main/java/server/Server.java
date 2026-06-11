@@ -9,9 +9,9 @@ import model.AuthData;
 import model.UserData;
 import service.BeenTakenException;
 import service.BadRequest;
-import service.gamePlayManage;
+import service.GamePlayManage;
 import service.UnauthorizedException;
-import service.userManage;
+import service.UserManage;
 import dataaccess.SqlAccess;
 import server.websocket.WebSocketHandler;
 
@@ -25,8 +25,8 @@ public class Server {
     //services and data access
     private final DataAccess dataAccess;
     //For phase 4 I changed MemoryDataAccess to this
-    private final userManage userManage;
-    private final gamePlayManage gamePlayManage;
+    private final UserManage userManage;
+    private final GamePlayManage gamePlayManage;
     private final Gson gson = new Gson();
     private final Javalin javalin;
 
@@ -38,8 +38,8 @@ public class Server {
 
         }
 
-        userManage = new userManage(dataAccess);
-        gamePlayManage = new gamePlayManage(dataAccess);
+        userManage = new UserManage(dataAccess);
+        gamePlayManage = new GamePlayManage(dataAccess);
 
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");

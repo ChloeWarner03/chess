@@ -12,7 +12,7 @@ import java.util.List;
 
 
 //Game related stuff
-public class gamePlayManage {
+public class GamePlayManage {
 
     private static final String WHITE = "WHITE";
     private static final String BLACK = "BLACK";
@@ -20,7 +20,7 @@ public class gamePlayManage {
     private final DataAccess dataAccess;
 
     //get my data access
-    public gamePlayManage(DataAccess dataAccess) {
+    public GamePlayManage(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
 

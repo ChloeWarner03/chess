@@ -13,17 +13,17 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 //Game service tests
-class gamePlayManageTests {
-    private gamePlayManage gamePlayManage;
-    private userManage userManage;
+class GamePlayManageTests {
+    private GamePlayManage gamePlayManage;
+    private UserManage userManage;
     private String authToken;
 
     //fresh start before each test
     @BeforeEach
     void setUp() throws DataException, BeenTakenException {
         DataAccess dataAccess = new MemoryDataAccess();
-        gamePlayManage = new gamePlayManage(dataAccess);
-        userManage = new userManage(dataAccess);
+        gamePlayManage = new GamePlayManage(dataAccess);
+        userManage = new UserManage(dataAccess);
         //register chloe to get a valid token
         AuthData auth = userManage.register(new UserData("chloe", "1234", "chloe@email.com"));
         authToken = auth.authToken();
