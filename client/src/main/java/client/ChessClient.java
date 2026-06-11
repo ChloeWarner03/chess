@@ -152,7 +152,7 @@ public class ChessClient implements NotificationHandler {
     public void notify(ServerMessage message) {
         switch (message.getServerMessageType()) {
             case NOTIFICATION -> whenNotified((ServerMessage.Notification) message);
-            case LOAD_GAME -> whenGameLoaded((ServerMessage.Load_Game) message);
+            case LOAD_GAME -> whenGameLoaded((ServerMessage.LoadGame) message);
             case ERROR -> whenError((ServerMessage.Error) message);
         }
         helpers.chessUserPrompt();
@@ -162,7 +162,7 @@ public class ChessClient implements NotificationHandler {
         out.print("\n" + SET_TEXT_COLOR_GREEN + message.message + "\n");
     }
 
-    private void whenGameLoaded(ServerMessage.Load_Game message) {
+    private void whenGameLoaded(ServerMessage.LoadGame message) {
         shared.currentGame = message.game;
 
         boolean whitePerspective = (shared.yourColor != ChessGame.TeamColor.BLACK);

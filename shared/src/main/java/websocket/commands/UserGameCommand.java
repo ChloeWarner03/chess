@@ -52,10 +52,10 @@ public class UserGameCommand {
         return gameID;
     }
     //this was needed to be static
-    public static class Make_Move extends UserGameCommand {
+    public static class MakeMove extends UserGameCommand {
         public ChessMove move;
 
-        public Make_Move(String authToken, Integer gameID, ChessMove move) {
+        public MakeMove(String authToken, Integer gameID, ChessMove move) {
             super(CommandType.MAKE_MOVE, authToken, gameID);
             this.move = move;
         }

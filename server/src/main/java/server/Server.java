@@ -9,9 +9,9 @@ import model.AuthData;
 import model.UserData;
 import service.BeenTakenException;
 import service.BadRequest;
-import service.gameplayManage;
+import service.GamePlayManage;
 import service.UnauthorizedException;
-import service.userManage;
+import service.UserManage;
 import dataaccess.SqlAccess;
 import server.websocket.WebSocketHandler;
 
@@ -25,8 +25,8 @@ public class Server {
     //services and data access
     private final DataAccess dataAccess;
     //For phase 4 I changed MemoryDataAccess to this
-    private final userManage userManage;
-    private final gameplayManage gameplayManage;
+    private final UserManage UserManage;
+    private final GamePlayManage GamePlayManage;
     private final Gson gson = new Gson();
     private final Javalin javalin;
 
@@ -38,8 +38,8 @@ public class Server {
 
         }
 
-        userManage = new userManage(dataAccess);
-        gameplayManage = new gameplayManage(dataAccess);
+        UserManage = new UserManage(dataAccess);
+        GamePlayManage = new GamePlayManage(dataAccess);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -100,7 +100,7 @@ public class Server {
             throws DataException, BadRequest {
 
         UserData user = gson.fromJson(ctx.body(), UserData.class);
-        AuthData result = userManage.register(user);
+        AuthData result = UserManage.register(user);
 
         ctx.result(gson.toJson(result));
     }
@@ -110,7 +110,7 @@ public class Server {
             throws DataException,  UnauthorizedException {
 
         UserData user = gson.fromJson(ctx.body(), UserData.class);
-        AuthData  result = userManage.login(user);
+        AuthData  result = UserManage.login(user);
 
         ctx.result (gson.toJson(result));
     }
@@ -120,7 +120,7 @@ public class Server {
             throws  DataException, UnauthorizedException {
 
         String authToken  = ctx.header("authorization");
-        userManage.logout(authToken);
+        UserManage.logout(authToken);
 
         ctx.result("{}");
     }
@@ -137,7 +137,7 @@ public class Server {
         String gameName  =  (String) body.get("gameName");
 
 
-        int gameID  = gameplayManage.createGame(authToken, gameName);
+        int gameID  = GamePlayManage.createGame(authToken, gameName);
         ctx.result (gson.toJson(Map.of("gameID", gameID)));
     }
 
@@ -147,7 +147,7 @@ public class Server {
             UnauthorizedException  {
 
         String authToken =  ctx.header("authorization");
-        var result =  gameplayManage.listGames(authToken);
+        var result =  GamePlayManage.listGames(authToken);
 
         ctx.result(gson.toJson(Map.of("games", result)));
     }
@@ -169,7 +169,7 @@ public class Server {
             throw new BadRequest("Missing gameID");
         }
         int gameID = ((Double) body.get("gameID")).intValue();
-        gameplayManage.joinGame(authToken, playerColor, gameID);
+        GamePlayManage.joinGame(authToken, playerColor, gameID);
         ctx.json("{}");
     }
 
@@ -177,7 +177,7 @@ public class Server {
     private void clear(Context ctx)
             throws DataException {
 
-        gameplayManage.clear();
+        GamePlayManage.clear();
         ctx.result("{}");
     }
 

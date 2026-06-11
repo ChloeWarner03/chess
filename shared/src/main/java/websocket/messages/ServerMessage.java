@@ -46,9 +46,9 @@ public class ServerMessage {
     //ADD MY STUFF UNDER HERE: (ABOVE IS THE STARTER CODE)
     //NEED a class for the Notification, loadGame and the error
     //holds a chess game and then will send it over
-    public static class Load_Game extends ServerMessage {
+    public static class LoadGame extends ServerMessage {
         public ChessGame game;
-        public Load_Game(ChessGame game) {
+        public LoadGame(ChessGame game) {
             this.serverMessageType = ServerMessageType.LOAD_GAME;
             this.game = game;
         }

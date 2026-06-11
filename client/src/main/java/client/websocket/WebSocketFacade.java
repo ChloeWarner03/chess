@@ -33,7 +33,7 @@ public class WebSocketFacade extends Endpoint{
                         var json = new com.google.gson.JsonParser().parse(message).getAsJsonObject();
                         String type = json.get("serverMessageType").getAsString();
                         ServerMessage serverMessage = switch (ServerMessage.ServerMessageType.valueOf(type)) {
-                            case LOAD_GAME -> new Gson().fromJson(message, ServerMessage.Load_Game.class);
+                            case LOAD_GAME -> new Gson().fromJson(message, ServerMessage.LoadGame.class);
                             case NOTIFICATION -> new Gson().fromJson(message, ServerMessage.Notification.class);
                             case ERROR -> new Gson().fromJson(message, ServerMessage.Error.class);
                         };
@@ -68,7 +68,7 @@ public class WebSocketFacade extends Endpoint{
 
     public void make_move(String authToken, Integer gameID, ChessMove move) throws ResponseException {
         try {
-            var action = new UserGameCommand.Make_Move(authToken, gameID, move);
+            var action = new UserGameCommand.MakeMove(authToken, gameID, move);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());

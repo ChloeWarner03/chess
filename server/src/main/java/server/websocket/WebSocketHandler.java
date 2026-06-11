@@ -158,7 +158,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
 
         String playerUser = authorized.username();
-        var loadGame = new ServerMessage.Load_Game(chessGame.game());
+        var loadGame = new ServerMessage.LoadGame(chessGame.game());
         session.getRemote().sendString(new Gson().toJson(loadGame));
 
         String myRole;
@@ -209,8 +209,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;
         }
 
-        UserGameCommand.Make_Move move =
-                new Gson().fromJson(rawMessage, UserGameCommand.Make_Move.class);
+        UserGameCommand.MakeMove move =
+                new Gson().fromJson(rawMessage, UserGameCommand.MakeMove.class);
 
         try {
             makeTheMove(game, move);
@@ -230,21 +230,21 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         //Helpers
 
     private void makeTheMove(model.GameData game,
-                             UserGameCommand.Make_Move move)
+                             UserGameCommand.MakeMove move)
             throws chess.InvalidMoveException {
 
         game.game().makeMove(move.move);
     }
 
     private void updateBoard(int gameID, model.GameData game,
-                             String username, UserGameCommand.Make_Move move, Session session)
+                             String username, UserGameCommand.MakeMove move, Session session)
             throws DataException {
 
         chessData.updateGame(game);
 
         try {
             connections.broadcast(gameID,
-                    new ServerMessage.Load_Game(game.game()), null);
+                    new ServerMessage.LoadGame(game.game()), null);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
