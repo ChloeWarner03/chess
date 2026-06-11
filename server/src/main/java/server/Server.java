@@ -31,7 +31,7 @@ public class Server {
     private final Javalin javalin;
 
     public Server() {
-        try {
+        try {//try check again
             dataAccess = new SqlAccess();
         } catch (DataException e) {
             throw new RuntimeException(e) ;
