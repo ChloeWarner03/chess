@@ -78,12 +78,12 @@ public class ChessClient implements NotificationHandler {
     //Prints a prompt so then the user will know that input is needed
     private void chessUserPrompt() {
         if (state == State.LOGGED_OUT) {
-            System.out.print(RESET_TEXT_COLOR + "[LOGGED_OUT] >>> " + SET_TEXT_COLOR_YELLOW);
+            System.out.print(RESET_TEXT_COLOR + "[LOGGED_OUT] >>> " + SET_TEXT_COLOR_BLUE);
         } else {
             System.out.print(
                     RESET_TEXT_COLOR +
                             "[" + username + "] (help for options) >>> " +
-                            SET_TEXT_COLOR_YELLOW);
+                            SET_TEXT_COLOR_BLUE);
         }
     }
 
@@ -127,22 +127,16 @@ public class ChessClient implements NotificationHandler {
                 return observeGame(params);
             }
 
-        } else if (state == State.OBSERVE) {
-            if (command.equals("move")) {
-                return makeMove(params);
-            }
-            if (command.equals("resign")) {
-                return resign();
-            }
-            if (command.equals("leave")) {
-                return leave();
-            }
-            if (command.equals("redraw")) {
-                return redraw();
-            }
-            if (command.equals("highlight")) {
-                return highlight(params);
-            }
+            } else if (state == State.IN_GAME) {
+            if (command.equals("move")) return makeMove(params);
+            if (command.equals("resign")) return resign();
+            if (command.equals("leave")) return leave();
+            if (command.equals("redraw")) return redraw();
+            if (command.equals("highlight")) return highlight(params);
+            } else if (state == State.OBSERVE) {
+            if (command.equals("leave")) return leave();
+            if (command.equals("redraw")) return redraw();
+            if (command.equals("highlight")) return highlight(params);
         }
 
         return help();
@@ -239,31 +233,39 @@ public class ChessClient implements NotificationHandler {
     private String help() {
         if (state == State.LOGGED_OUT) {
             return SET_TEXT_COLOR_BLUE + """
-                    register <USERNAME> <PASSWORD> <EMAIL> - to create an account
-                    login <USERNAME> <PASSWORD> - to play chess
-                    quit - playing chess
-                    help - with possible commands
-                    """ + RESET_TEXT_COLOR;
+                register <USERNAME> <PASSWORD> <EMAIL> - to create an account
+                login <USERNAME> <PASSWORD> - to play chess
+                quit - playing chess
+                help - with possible commands
+                """ + RESET_TEXT_COLOR;
         }
         if (state == State.LOGGED_IN) {
             return SET_TEXT_COLOR_BLUE + """
-                    create <NAME> - a game
-                    list - games
-                    play <NUMBER> [WHITE|BLACK] - a game
-                    observe <NUMBER> - a game
-                    logout - when you are done
-                    quit - playing chess
-                    help - with possible commands
-                    """ + RESET_TEXT_COLOR;
+                create <NAME> - a game
+                list - games
+                play <NUMBER> [WHITE|BLACK] - a game
+                observe <NUMBER> - a game
+                logout - when you are done
+                quit - playing chess
+                help - with possible commands
+                """ + RESET_TEXT_COLOR;
         }
-        return SET_TEXT_COLOR_BLUE + """
-                move <start> <end> [promotion] - a piece (example input: move a3 a5)
+        if (state == State.OBSERVE) {
+            return SET_TEXT_COLOR_BLUE + """
                 redraw - the chess board
                 highlight <position> - legal moves (example input: highlight f3)
                 leave - the game
-                resign - forfeit the game
                 help - with possible commands
                 """ + RESET_TEXT_COLOR;
+        }
+        return SET_TEXT_COLOR_BLUE + """
+            move <start> <end> [promotion] - a piece (example input: move a3 a5)
+            redraw - the chess board
+            highlight <position> - legal moves (example input: highlight f3)
+            leave - the game
+            resign - forfeit the game
+            help - with possible commands
+            """ + RESET_TEXT_COLOR;
     }
 
     //make sure that the game number is valid before using it
