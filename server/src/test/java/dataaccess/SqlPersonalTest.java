@@ -159,7 +159,7 @@ class SqlPersonalTest {
     @Test
     void getAuthorizationFail() throws DataException {
         // token that doesnt exist should return null
-        assertNull(data.getAuthorization("failtoken"));
+        assertNull(data.getAuthorization("token Failed"));
     }
 
     //deleteAuthorization: need Pos and
@@ -176,7 +176,7 @@ class SqlPersonalTest {
     @Test
     void deleteAuthorizationNeg() {
         // deleting token that doesnt exist should not throw
-        assertDoesNotThrow(() -> data.deleteAuthorization("failtoken"));
+        assertDoesNotThrow(() -> data.deleteAuthorization("token Failed"));
     }
 
     //clear: pos
@@ -185,9 +185,7 @@ class SqlPersonalTest {
         // add some stuff
         data.makeChessUser(new UserData("chloe", "pass", "chloe@email.com"));
         data.createGame(new GameData(0, null, null, "testGame", new ChessGame()));
-        // wipe it all
         data.clear();
-        // everything should be gone
         assertNull(data.getUser("chloe"));
         assertEquals(0, data.listGames().size());
     }

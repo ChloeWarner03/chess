@@ -32,7 +32,7 @@ class gameplayManageTests {
     //create game works
     @Test
     void createSuccess() throws DataException, UnauthorizedException, BadRequest {
-        int gameID = gameplayManage.createGame(authToken, "myGame");
+        int gameID = gameplayManage.createGame(authToken, "My Chess Game");
         assertTrue(gameID > 0);
     }
     //Cant make a game with no name
@@ -44,13 +44,13 @@ class gameplayManageTests {
     //bad token cant create game
     @Test
     void unauthorizedCreate() {
-        assertThrows(UnauthorizedException.class, () -> gameplayManage.createGame("badtoken", "myGame"));
+        assertThrows(UnauthorizedException.class, () -> gameplayManage.createGame("Token Does Not Work", "myGame"));
     }
 
     //list games works
     @Test
     void listSuccess() throws DataException, UnauthorizedException, BadRequest {
-        gameplayManage.createGame(authToken, "myGame");
+        gameplayManage.createGame(authToken, "My Chess Game");
         List<GameData> games = gameplayManage.listGames(authToken);
         assertEquals(1, games.size());
     }
@@ -64,14 +64,14 @@ class gameplayManageTests {
     //join game works
     @Test
     void joinSuccess() throws DataException, UnauthorizedException, BadRequest, BeenTakenException {
-        int gameID = gameplayManage.createGame(authToken, "myGame");
+        int gameID = gameplayManage.createGame(authToken, "My Chess Game");
         assertDoesNotThrow(() -> gameplayManage.joinGame(authToken, "WHITE", gameID));
     }
 
     //cant join taken color
     @Test
     void colorTaken() throws DataException, UnauthorizedException, BadRequest, BeenTakenException {
-        int gameID = gameplayManage.createGame(authToken, "myGame");
+        int gameID = gameplayManage.createGame(authToken, "My Chess Game");
         gameplayManage.joinGame(authToken, "WHITE", gameID);
         assertThrows(BeenTakenException.class, () -> gameplayManage.joinGame(authToken, "WHITE", gameID));
     }
@@ -86,15 +86,15 @@ class gameplayManageTests {
     @Test
     void joinUnauthorized() throws DataException,
             UnauthorizedException, BadRequest {
-        int gameID = gameplayManage.createGame(authToken, "myGame");
+        int gameID = gameplayManage.createGame(authToken, "My Chess Game");
         assertThrows(UnauthorizedException.class,
-                () -> gameplayManage.joinGame("badtoken", "WHITE", gameID));
+                () -> gameplayManage.joinGame("Token Does Not Work", "BLACK", gameID));
     }
-    // invalid color throws BadRequest
+    // invalid color
     @Test
     void joinInvalidColor() throws DataException,
             UnauthorizedException, BadRequest {
-        int gameID = gameplayManage.createGame(authToken, "myGame");
+        int gameID = gameplayManage.createGame(authToken, "My Chess Game");
         assertThrows(BadRequest.class,
                 () -> gameplayManage.joinGame(authToken, "PURPLE", gameID));
     }
@@ -102,10 +102,10 @@ class gameplayManageTests {
     @Test
     void joinBadGameID() {
         assertThrows(BadRequest.class,
-                () -> gameplayManage.joinGame(authToken, "WHITE", 99999));
+                () -> gameplayManage.joinGame(authToken, "BLACK", 39393));
     }
 
-    //Base case when there are no games there is no list
+    //no games there is no list
     @Test
     void listEmpty() throws DataException, UnauthorizedException {
         List<GameData> games = gameplayManage.listGames(authToken);

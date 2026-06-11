@@ -39,12 +39,12 @@ public class WebSocketFacade extends Endpoint{
                         };
                         notificationHandler.notify(serverMessage);
                     } catch (Exception e) {
-                        System.out.println("Error handling message: " + e.getMessage());
+                        System.out.println("Error: " + e.getMessage());
                     }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
-            System.out.println("WEBSOCKET ERROR: " + ex.getMessage());
+            System.out.println("Error: " + ex.getMessage());
             ex.printStackTrace();
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }

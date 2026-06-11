@@ -65,7 +65,7 @@ class userManageTests {
     //bad token cant logout
     @Test
     void logoutBadToken() {
-        assertThrows(UnauthorizedException.class, () -> userManage.logout("badtoken"));
+        assertThrows(UnauthorizedException.class, () -> userManage.logout("Wrong Token"));
     }
 
     //missing fields = BadRequest

@@ -36,17 +36,17 @@ public class  ServerFacade {
             myConnection.setRequestProperty( "Authorization", authToken);
         }
         if (body !=  null) {
-            attachTheBody(myConnection,  body);
+            attachAsJson(myConnection,  body);
         }
         myConnection.connect();
         int theResponseCode =  myConnection.getResponseCode();
         if (theResponseCode  >=  400) {
-             handleTheError(myConnection ,  theResponseCode);
+             errorOut(myConnection ,  theResponseCode);
         }
         return  readTheResponse( myConnection , responseClass);
     }
 
-    private void  attachTheBody(HttpURLConnection  myConnection, Object body) throws Exception {
+    private void  attachAsJson(HttpURLConnection  myConnection, Object body) throws Exception {
         myConnection.setDoOutput(true);
 
         try (OutputStream myOutputStream  = myConnection.getOutputStream()) {
@@ -54,7 +54,7 @@ public class  ServerFacade {
         }
     }
 
-    private void handleTheError(HttpURLConnection  myConnection, int theResponseCode) throws Exception {
+    private void errorOut(HttpURLConnection  myConnection, int theResponseCode) throws Exception {
         InputStream myErrorStream  = myConnection.getErrorStream();
         String thereIsAnError  = "Error " + theResponseCode;
 
@@ -73,10 +73,10 @@ public class  ServerFacade {
 
 
     private <T>  T readTheResponse(HttpURLConnection myConnection, Class<T> responseClass) throws Exception {
-        if (responseClass  == null) { //some dont need response
+        if (responseClass  == null) {
             return null;
         }
-        try (InputStream  myInputStream = myConnection.getInputStream()) { //convert to json
+        try (InputStream  myInputStream = myConnection.getInputStream()) {
             return  gson.fromJson(new InputStreamReader(myInputStream), responseClass);
         }
     }
@@ -107,9 +107,9 @@ public class  ServerFacade {
 
     //create the games
     public  int  createGame ( String gameName,  String authToken) throws Exception {
-        var myGameBody = Map.of("gameName", gameName);
-        record  CreateResponse(int gameID) {}
-        var  myNewGame  =  sendToTheServer("POST",  "/game", myGameBody, CreateResponse.class, authToken);
+        var chessGameBody = Map.of("gameName", gameName);
+        record  CreatedChessGame(int gameID) {}
+        var  myNewGame  =  sendToTheServer("POST",  "/game", chessGameBody, CreatedChessGame.class, authToken);
         return  myNewGame.gameID();
     }
 
