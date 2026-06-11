@@ -462,14 +462,14 @@ public class ChessClient implements NotificationHandler {
     }
 
     private void onNotification(ServerMessage.Notification message) {
-        out.print(SET_TEXT_COLOR_MAGENTA + message.message + "\n");
+        out.print("\n" + SET_TEXT_COLOR_MAGENTA + message.message + "\n");
     }
 
     private void onLoadGame(ServerMessage.Load_Game message) {
         currentGame = message.game;
 
         boolean whitePerspective = (yourColor != ChessGame.TeamColor.BLACK);
-
+        out.print("\n");
         MakeChessBoard.createChessBoard(currentGame, whitePerspective);
     }
 
