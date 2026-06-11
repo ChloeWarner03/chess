@@ -44,6 +44,7 @@ public class ServerMessage {
     }
 
     //ADD MY STUFF UNDER HERE: (ABOVE IS THE STARTER CODE)
+    //ADD MY STUFF UNDER HERE: (ABOVE IS THE STARTER CODE)
     //NEED a class for the Notification, loadGame and the error
     //holds a chess game and then will send it over
     public static class LoadGame extends ServerMessage {

@@ -90,6 +90,7 @@ public class PostLoginChess {
         if (params.length != 2) {
             throw new Exception(RESET_TEXT_COLOR + SET_TEXT_COLOR_MAGENTA + "Error, you are expected to type:  <number> <WHITE|BLACK>" + "\n");
         }
+        shared.savedGames = server.listGames(shared.authToken);
         int myGameNumber = helpers.chessValidGameNumber(params[0]);
         GameData myGame = shared.savedGames[myGameNumber - 1];
         String myColor = params[1].toUpperCase();
@@ -102,8 +103,6 @@ public class PostLoginChess {
         shared.gameWebSocket = new WebSocketFacade(server.getTheServerURL(), notificationHandler);
 
         shared.gameWebSocket.connect(shared.authToken, shared.openGameNumber);
-
-        MakeChessBoard.createChessBoard(myGame.game() != null ? myGame.game() : new ChessGame(), myColor.equals("WHITE"));
         return "joined " + myGame.gameName() + " as " + myColor + "\n";
     }
 
@@ -121,6 +120,6 @@ public class PostLoginChess {
         shared.gameWebSocket = new WebSocketFacade(server.getTheServerURL(), notificationHandler);
         shared.gameWebSocket.connect(shared.authToken, shared.openGameNumber);
 
-        return "You are now an obserber";
+        return "You are now an observer";
     }
 }

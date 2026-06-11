@@ -46,11 +46,15 @@ public class InGameChess {
             }
         }
 
+        if (shared.currentGame.getTeamTurn() != shared.yourColor) {
+            throw new Exception("Error: it is not your turn\n");
+        }
+
         ChessMove move = new ChessMove(start, end, promotion);
 
         shared.gameWebSocket.makeMove(shared.authToken, shared.openGameNumber, move);
 
-        return "move has been sent!";
+        return "move has been sent!\n";
     }
 
     public String redraw() throws Exception {
