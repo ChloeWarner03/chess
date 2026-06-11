@@ -114,31 +114,32 @@ public class ChessClient implements NotificationHandler {
 
             } else if (shared.state == State.IN_GAME) {
 
-            if (command.equals("move"))
+            if (command.equals("move")) {
                 return inGame.makeMove(params);
+            }
+            if (command.equals("resign")) {
+               return inGame.resign();}
 
-            if (command.equals("resign"))
-                return inGame.resign();
+            if (command.equals("leave")) {
+                return inGame.leave();}
 
-            if (command.equals("leave"))
-                return inGame.leave();
+            if (command.equals("redraw")){
+                return inGame.redraw();}
 
-            if (command.equals("redraw"))
-                return inGame.redraw();
-
-            if (command.equals("highlight"))
-                return inGame.highlight(params);
+            if (command.equals("highlight")) {
+                return inGame.highlight(params);}
 
             } else if (shared.state == State.OBSERVE) {
 
-            if (command.equals("leave"))
-                return inGame.leave();
+            if (command.equals("leave")) {
+                return inGame.leave();}
 
-            if (command.equals("redraw"))
-                return inGame.redraw();
+            if (command.equals("redraw")) {
+                return inGame.redraw();}
 
-            if (command.equals("highlight"))
-                return inGame.highlight(params);
+            if (command.equals("highlight")) {
+                return inGame.highlight(params);}
+
         }
 
         return helpers.help();

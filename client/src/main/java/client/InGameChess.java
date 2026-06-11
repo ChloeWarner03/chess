@@ -48,7 +48,7 @@ public class InGameChess {
 
         ChessMove move = new ChessMove(start, end, promotion);
 
-        shared.gameWebSocket.make_move(shared.authToken, shared.openGameNumber, move);
+        shared.gameWebSocket.makeMove(shared.authToken, shared.openGameNumber, move);
 
         return "move has been sent!";
     }
