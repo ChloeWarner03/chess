@@ -11,20 +11,20 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 //User service tests
-class UserManageTests {
-    private UserManage UserManage;
+class userManageTests {
+    private userManage userManage;
 
     //fresh start before each test
     @BeforeEach
     void setUp() {
         DataAccess dataAccess = new MemoryDataAccess();
-        UserManage = new UserManage(dataAccess);
+        userManage = new userManage(dataAccess);
     }
 
     //register works
     @Test
     void registerSuccess() throws DataException, BeenTakenException {
-        AuthData result = UserManage.register(new UserData("chloe", "1234", "chloe@email.com"));
+        AuthData result = userManage.register(new UserData("chloe", "1234", "chloe@email.com"));
         assertNotNull(result.authToken());
         assertEquals("chloe", result.username());
     }
@@ -33,15 +33,15 @@ class UserManageTests {
     @Test
     void registerDuplicate() throws DataException, BeenTakenException {
         var chloe = new UserData("chloe", "1234", "chloe@email.com");
-        UserManage.register(chloe);
-        assertThrows(BeenTakenException.class, () -> UserManage.register(chloe));
+        userManage.register(chloe);
+        assertThrows(BeenTakenException.class, () -> userManage.register(chloe));
     }
 
     //login works
     @Test
     void loginSuccess() throws DataException, BeenTakenException, UnauthorizedException {
-        UserManage.register(new UserData("chloe", "1234", "chloe@email.com"));
-        AuthData result = UserManage.login(new UserData("chloe", "1234", "chloe@email.com"));
+        userManage.register(new UserData("chloe", "1234", "chloe@email.com"));
+        AuthData result = userManage.login(new UserData("chloe", "1234", "chloe@email.com"));
         assertNotNull(result.authToken());
         assertEquals("chloe", result.username());
     }
@@ -51,41 +51,41 @@ class UserManageTests {
     void loginWrongPassword() throws DataException, BeenTakenException {
         var chloe = new UserData("chloe", "1234", "chloe@email.com");
         var chloeWrongPassword = new UserData("chloe", "wrongpassword", "");
-        UserManage.register(chloe);
-        assertThrows(UnauthorizedException.class, () -> UserManage.login(chloeWrongPassword));
+        userManage.register(chloe);
+        assertThrows(UnauthorizedException.class, () -> userManage.login(chloeWrongPassword));
     }
 
     //logout works
     @Test
     void logoutSuccess() throws DataException, BeenTakenException, UnauthorizedException {
-        AuthData auth = UserManage.register(new UserData("chloe", "1234", "chloe@email.com"));
-        assertDoesNotThrow(() -> UserManage.logout(auth.authToken()));
+        AuthData auth = userManage.register(new UserData("chloe", "1234", "chloe@email.com"));
+        assertDoesNotThrow(() -> userManage.logout(auth.authToken()));
     }
 
     //bad token cant logout
     @Test
     void logoutBadToken() {
-        assertThrows(UnauthorizedException.class, () -> UserManage.logout("Wrong Token"));
+        assertThrows(UnauthorizedException.class, () -> userManage.logout("Wrong Token"));
     }
 
     //missing fields = BadRequest
     @Test
     void registerMissingFields() {
         var noPassword = new UserData("chloe", null, "chloe@email.com");
-        assertThrows(BadRequest.class, () -> UserManage.register(noPassword));
+        assertThrows(BadRequest.class, () -> userManage.register(noPassword));
     }
 
     //user that is not real cannot login
     @Test
     void loginNoSuchUser() {
         var ghost = new UserData("ghost", "1234", "");
-        assertThrows(UnauthorizedException.class, () -> UserManage.login(ghost));
+        assertThrows(UnauthorizedException.class, () -> userManage.login(ghost));
     }
 
     //missing password
     @Test
     void missingFields() {
         var noPassword = new UserData("chloe", null, "chloe@email.com");
-        assertThrows(BadRequest.class, () -> UserManage.register(noPassword));
+        assertThrows(BadRequest.class, () -> userManage.register(noPassword));
     }
 }
