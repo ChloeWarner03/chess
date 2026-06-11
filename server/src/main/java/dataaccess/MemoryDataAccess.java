@@ -18,12 +18,13 @@ public class MemoryDataAccess implements DataAccess {
     private int nextGameID = 1;
 
     //User stuff
-    public void  makeChessUser(UserData user) throws DataException {
-        // lock down the password before saving, just like the database version
-        String safePassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-        users.put( user.username() , new UserData(user.username(), safePassword, user.email()));
+    public void makeChessUser(UserData user) throws DataException {
+        if (user == null) {
+            throw new DataException("There is no Chess User");
+        }
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+        users.put(user.username(), new UserData(user.username(), hashedPassword, user.email()));
     }
-
     public UserData  getUser(String username) throws DataException {
         return users.get(username);
     }
@@ -68,9 +69,13 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     //wipes everything for testing
-    public void clear()  throws  DataException {
+    public void clear() throws DataException {
+        clearAllData();
+    }
+
+    private void clearAllData() {
         users.clear();
-        games.clear() ;
+        games.clear();
         auths.clear();
     }
 }

@@ -91,35 +91,34 @@ public class SqlAccess implements DataAccess {
 
 
 
-    private int runUpdate(String sql,   Object... params)  throws  DataException {
-        try  (var  connection =  DatabaseManager.getConnection()) {
-            try (var query  = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+    private int runUpdate(String sql, Object... params) throws DataException {
+        try (var connection = DatabaseManager.getConnection()) {
+            try (var query = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-                // fill in the placeholders we set for ???
-                for (int i =  0; i  < params.length; i++) {
-                    var param =  params[i];
+                // fill in the ??? placeholders
+                for (int i = 0; i < params.length; i++) {
+                    var param = params[i];
                     if (param == null) {
-                        query.setNull  (i + 1,  Types.NULL ) ;
-                    } else if (param instanceof String) {
-                        query.setString(i + 1, (String) param);
-                    } else if  (param instanceof Integer)
-                    {
-                        query.setInt (i + 1, (Integer) param);
+                        query.setNull(i + 1, Types.NULL);
+                    } else if (param instanceof String myString) {
+                        query.setString(i + 1, myString);
+                    } else if (param instanceof Integer myInt) {
+                        query.setInt(i + 1, myInt);
                     }
                 }
 
-                // run the sql
+                // run it
                 query.executeUpdate();
 
-                // return the generated key if there is one
-                var queryResults=  query.getGeneratedKeys();
-                if (queryResults.next())  {
-                    return queryResults.getInt(1);
+                // give back the generated key if there is one
+                var myResults = query.getGeneratedKeys();
+                if (myResults.next()) {
+                    return myResults.getInt(1);
                 }
                 return 0;
             }
         } catch (SQLException e) {
-            throw new DataException("Failed to run update: " + e.getMessage());
+            throw new DataException("runUpdate did not work: " + e.getMessage());
         }
     }
 

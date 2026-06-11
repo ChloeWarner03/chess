@@ -172,11 +172,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         var notification = new ServerMessage.Notification(playerUser + " joined as " + myRole);
         connections.broadcast(command.getGameID(), notification, session);
     }
-
-
-    //Allow the user to input what move they want to make.
-    // The board is updated to reflect the result of the move,
-    // and the board automatically updates on all clients involved in the game.
     private void makeMove(Session session, UserGameCommand command, String rawMessage)
             throws IOException, DataException {
 

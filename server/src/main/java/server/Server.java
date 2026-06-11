@@ -41,7 +41,9 @@ public class Server {
         userManage = new userManage(dataAccess);
         gameplayManage = new gameplayManage(dataAccess);
 
-        javalin = Javalin.create(config -> config.staticFiles.add("web"));
+        javalin = Javalin.create(config -> {
+            config.staticFiles.add("web");
+        });
 
         //Endpoints
         javalin.post("/user",  this::register);
